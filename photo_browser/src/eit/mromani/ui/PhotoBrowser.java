@@ -2,6 +2,7 @@ package eit.mromani.ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.TimerTask;
 
 /**
  *
@@ -16,24 +17,9 @@ public class PhotoBrowser extends JFrame {
 
     private JPanel _mainContent;
     private JPanel _menuContent;
-    private JPanel _statusBarContent;
+    private StatusBar _statusBarContent;
+    private MenuBar _mainMenuBar;
 
-    private JMenuBar _mainMenuBar;
-
-    private JMenu _fileMenu;
-    private JMenuItem _importOption;
-    private JMenuItem _deleteOption;
-    private JMenuItem _quitOption;
-
-    private JMenu _viewMenu;
-    private JMenuItem _photoViewerOption;
-    private JMenuItem _browserOption;
-
-    JLabel _statusLabel;
-
-
-
-    private JLabel statusBarMessage;
 
     public PhotoBrowser() {
         super("Photo Browser App");
@@ -52,8 +38,6 @@ public class PhotoBrowser extends JFrame {
 
         setupMenuBar();
 
-        buildMenuBar();
-
         buildWindow();
 
     }
@@ -64,53 +48,15 @@ public class PhotoBrowser extends JFrame {
     private void setupPanels() {
         _mainContent = new JPanel();
         _menuContent = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        _statusBarContent = new JPanel();
+        _statusBarContent = new StatusBar();
     }
 
     /**
      * This function setups the menu bar and the child elements
      */
     private void setupMenuBar() {
-        _mainMenuBar = new JMenuBar();
-
-        _fileMenu = new JMenu("File");
-        _importOption = new JMenuItem("Import");
-        _deleteOption = new JMenuItem("Delete");
-        _quitOption = new JMenuItem("Quit");
-
-        _viewMenu = new JMenu("View");
-        _photoViewerOption = new JMenuItem("Photo Viewer");
-        _browserOption = new JMenuItem("Browse");
-
-    }
-
-    /**
-     * This function builds the menu bar with the proper hierarchy
-     */
-    private void buildMenuBar() {
+        _mainMenuBar = new MenuBar();
         _menuContent.add(_mainMenuBar);
-        _mainMenuBar.add(_fileMenu);
-        _mainMenuBar.add(_viewMenu);
-
-        _fileMenu.add(_importOption);
-        _fileMenu.add(_deleteOption);
-        _fileMenu.add(_quitOption);
-
-        _viewMenu.add(_photoViewerOption);
-        _viewMenu.add(_browserOption);
-
-    }
-
-    /**
-     * This function attaches a listener to every menu option
-     */
-    private void setupMenuListeners() {
-
-    }
-
-    private void showStatusMessage(String message){
-        _statusLabel.setText(message);
-
     }
 
     /**
