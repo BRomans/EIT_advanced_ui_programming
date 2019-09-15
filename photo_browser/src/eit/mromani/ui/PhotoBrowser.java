@@ -1,7 +1,6 @@
 package eit.mromani.ui;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.DefaultMenuLayout;
 import java.awt.*;
 
 /**
@@ -15,15 +14,24 @@ public class PhotoBrowser extends JFrame {
     public static int MINIMUM_WIDTH_PX = 1000;
     public static int MINIMUM_HEIGHT_PX = 1000;
 
-    private JPanel mainContent;
-    private JPanel menuContent;
-    private JPanel statusBarContent;
+    private JPanel _mainContent;
+    private JPanel _menuContent;
+    private JPanel _statusBarContent;
 
-    private JMenuBar mainMenuBar;
-    private JMenu fileMenu;
-    private JMenuItem importOption;
-    private JMenuItem deleteOption;
-    private JMenuItem quitOption;
+    private JMenuBar _mainMenuBar;
+
+    private JMenu _fileMenu;
+    private JMenuItem _importOption;
+    private JMenuItem _deleteOption;
+    private JMenuItem _quitOption;
+
+    private JMenu _viewMenu;
+    private JMenuItem _photoViewerOption;
+    private JMenuItem _browserOption;
+
+    JLabel _statusLabel;
+
+
 
     private JLabel statusBarMessage;
 
@@ -54,40 +62,64 @@ public class PhotoBrowser extends JFrame {
      * This function setups the main panels of the window
      */
     private void setupPanels() {
-        mainContent = new JPanel();
-        menuContent = new JPanel();
-        statusBarContent = new JPanel();
+        _mainContent = new JPanel();
+        _menuContent = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        _statusBarContent = new JPanel();
     }
 
     /**
      * This function setups the menu bar and the child elements
      */
     private void setupMenuBar() {
-        mainMenuBar = new JMenuBar();
-        fileMenu = new JMenu("File");
-        importOption = new JMenuItem("Import");
-        deleteOption = new JMenuItem("Delete");
-        quitOption = new JMenuItem("Quit");
+        _mainMenuBar = new JMenuBar();
+
+        _fileMenu = new JMenu("File");
+        _importOption = new JMenuItem("Import");
+        _deleteOption = new JMenuItem("Delete");
+        _quitOption = new JMenuItem("Quit");
+
+        _viewMenu = new JMenu("View");
+        _photoViewerOption = new JMenuItem("Photo Viewer");
+        _browserOption = new JMenuItem("Browse");
+
     }
 
     /**
      * This function builds the menu bar with the proper hierarchy
      */
     private void buildMenuBar() {
-        menuContent.add(mainMenuBar);
-        mainMenuBar.add(fileMenu);
-        fileMenu.add(importOption);
-        fileMenu.add(deleteOption);
-        fileMenu.add(quitOption);
+        _menuContent.add(_mainMenuBar);
+        _mainMenuBar.add(_fileMenu);
+        _mainMenuBar.add(_viewMenu);
+
+        _fileMenu.add(_importOption);
+        _fileMenu.add(_deleteOption);
+        _fileMenu.add(_quitOption);
+
+        _viewMenu.add(_photoViewerOption);
+        _viewMenu.add(_browserOption);
+
+    }
+
+    /**
+     * This function attaches a listener to every menu option
+     */
+    private void setupMenuListeners() {
+
+    }
+
+    private void showStatusMessage(String message){
+        _statusLabel.setText(message);
+
     }
 
     /**
      * This function builds the window elements with the proper hierarchy
      */
     private void buildWindow() {
-        this.getContentPane().add(menuContent, BorderLayout.NORTH);
-        this.getContentPane().add(mainContent, BorderLayout.CENTER);
-        this.getContentPane().add(statusBarContent, BorderLayout.SOUTH);
+        this.getContentPane().add(_menuContent, BorderLayout.NORTH);
+        this.getContentPane().add(_mainContent, BorderLayout.CENTER);
+        this.getContentPane().add(_statusBarContent, BorderLayout.SOUTH);
         this.pack();
     }
 }
