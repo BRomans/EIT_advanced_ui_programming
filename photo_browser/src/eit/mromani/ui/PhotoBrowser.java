@@ -1,9 +1,11 @@
 package eit.mromani.ui;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  *
@@ -120,14 +122,14 @@ public class PhotoBrowser extends JFrame {
      */
     private void  buildMenuBar(){
         _menuContent.add(_mainMenuBar);
-
+        // add file menu and view menu to menu bar
         _mainMenuBar.add(_fileMenu);
         _mainMenuBar.add(_viewMenu);
-
+        // add child options to file menu
         _fileMenu.add(_importOption);
         _fileMenu.add(_deleteOption);
         _fileMenu.add(_quitOption);
-
+        // add child options to view menu
         _viewMenu.add(_photoViewerOption);
         _viewMenu.add(_browserOption);
 
@@ -152,7 +154,13 @@ public class PhotoBrowser extends JFrame {
         _importOption.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser photoPicker = new JFileChooser();
+                File selectedFile = _mainMenuBar.loadPicture();
+                if (selectedFile != null) {
+                    _statusBarContent.showStatusMessage("Successfully loaded file: " + selectedFile);
+                } else {
+                    _statusBarContent.showStatusMessage("No file could be loaded");
+
+                }
             }
         });
 
@@ -173,7 +181,7 @@ public class PhotoBrowser extends JFrame {
         _photoViewerOption.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                _statusBarContent.displayNotImplemented("VIEW PHOTO");
+                _statusBarContent.displayNotImplemented("PHOTO VIEWER");
             }
         });
 

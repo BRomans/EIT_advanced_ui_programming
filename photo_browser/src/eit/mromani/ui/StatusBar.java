@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class StatusBar extends JPanel {
 
     private JLabel _statusLabel;
+    private String _statusPlaceholder = "#################";
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public StatusBar() {
@@ -23,7 +24,7 @@ public class StatusBar extends JPanel {
     }
 
     private void initFields() {
-        _statusLabel = new JLabel("#################");
+        _statusLabel = new JLabel(_statusPlaceholder);
         this.add(_statusLabel, BorderLayout.CENTER);
     }
 
@@ -49,7 +50,7 @@ public class StatusBar extends JPanel {
             @Override
             public void run() {
                 System.out.println("Clear status message");
-                _statusLabel.setText("#################");
+                _statusLabel.setText(_statusPlaceholder);
             }
         }, 5, TimeUnit.SECONDS);
 
