@@ -7,13 +7,19 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *
+ * @author BRomans
+ *
+ * This class implements a JPanel  with status bar functionalities
+ */
 public class StatusBar extends JPanel {
 
     private JLabel _statusLabel;
-    private JLabel _statusBarMessage;
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public StatusBar() {
+        initFields();
     }
 
     private void initFields() {
@@ -24,7 +30,7 @@ public class StatusBar extends JPanel {
     /**
      * This function prepares a non-implemented message
      *
-     * @param componentName
+     * @param componentName contains the name of the component to be implemented
      */
     public void displayNotImplemented(String componentName) {
         String message = componentName + " has not been implemented yet!";
@@ -43,18 +49,10 @@ public class StatusBar extends JPanel {
             @Override
             public void run() {
                 System.out.println("Clear status message");
-                showStatusMessage("");
+                _statusLabel.setText("#################");
             }
         }, 5, TimeUnit.SECONDS);
 
-        while (!timer.isDone()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException exception) {
-                exception.printStackTrace();
-            }
-
-        }
     }
 }
 
