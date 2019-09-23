@@ -1,7 +1,6 @@
-package eit.mromani.ui;
+package eit.mromani.controllers;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,7 +10,7 @@ import java.io.File;
  *
  * @author BRomans
  *
- * This is the class that draws the main interface
+ * This is the class that draws the main interface using JFrame
  */
 public class PhotoBrowser extends JFrame {
 
@@ -21,7 +20,7 @@ public class PhotoBrowser extends JFrame {
     public static int PREFERRED_HEIGHT_PX = 1000;
     public static int MAXIMUM_WIDTH_PX = 1600;
     public static int MAXIMUM_HEIGHT_PX = 1600;
-
+  
     // main components
     private JPanel _mainContent;
     private JPanel _menuContent;
@@ -62,7 +61,7 @@ public class PhotoBrowser extends JFrame {
      */
     private void setupInterface() {
 
-        setupPanels();
+        initPanels();
 
         initMenuBar();
 
@@ -83,7 +82,7 @@ public class PhotoBrowser extends JFrame {
     /**
      * This function setups the main panels of the window
      */
-    private void setupPanels() {
+    private void initPanels() {
         _mainContent = new JPanel();
 
         _menuContent = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -122,13 +121,16 @@ public class PhotoBrowser extends JFrame {
      */
     private void  buildMenuBar(){
         _menuContent.add(_mainMenuBar);
+
         // add file menu and view menu to menu bar
         _mainMenuBar.add(_fileMenu);
         _mainMenuBar.add(_viewMenu);
+
         // add child options to file menu
         _fileMenu.add(_importOption);
         _fileMenu.add(_deleteOption);
         _fileMenu.add(_quitOption);
+
         // add child options to view menu
         _viewMenu.add(_photoViewerOption);
         _viewMenu.add(_browserOption);

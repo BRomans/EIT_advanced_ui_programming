@@ -1,6 +1,6 @@
 package eit.mromani;
 
-import eit.mromani.ui.PhotoBrowser;
+import eit.mromani.controllers.PhotoBrowser;
 
 /**
  *

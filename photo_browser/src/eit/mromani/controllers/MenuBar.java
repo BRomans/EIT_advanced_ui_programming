@@ -1,4 +1,4 @@
-package eit.mromani.ui;
+package eit.mromani.controllers;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
