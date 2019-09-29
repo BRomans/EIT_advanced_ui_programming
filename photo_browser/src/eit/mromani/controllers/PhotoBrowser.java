@@ -23,7 +23,7 @@ public class PhotoBrowser extends JFrame {
   
     // main components
     private JPanel _menuContent;
-    private JPanel _photoContainer;
+    private JScrollPane _photoContainer;
     private StatusBar _statusBarContent;
     private MenuBar _mainMenuBar;
 
@@ -87,12 +87,14 @@ public class PhotoBrowser extends JFrame {
         _menuContent = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         //FIXME dimension not working
-        Dimension photoContainerSize = new Dimension(getWidth()- 20, getHeight() - 20);
 
-        _photoContainer = new JPanel();
-        _photoContainer.setBackground(Color.CYAN);
+        _photoContainer = new JScrollPane();
+        _photoContainer.setBackground(Color.BLUE);
+        _photoContainer.getViewport().setBackground(Color.CYAN);
         _photoContainer.setOpaque(true);
-        _photoContainer.setSize(photoContainerSize);
+       // _photoContainer.setSize(photoContainerSize);
+        _photoContainer.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        _photoContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         _statusBarContent = new StatusBar();
 
@@ -202,7 +204,9 @@ public class PhotoBrowser extends JFrame {
             _statusBarContent.showStatusMessage("Successfully loaded file: " + filePath);
             PhotoComponent photoComponent = new PhotoComponent();
             photoComponent.displayImage(filePath);
-            _photoContainer.add(photoComponent);
+            _photoContainer.getViewport().add(photoComponent);
+
+
         } else {
             _statusBarContent.showStatusMessage("No file could be loaded");
 
