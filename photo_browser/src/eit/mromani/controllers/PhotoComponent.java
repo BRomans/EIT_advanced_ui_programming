@@ -4,6 +4,7 @@ import eit.mromani.model.PhotoComponentModel;
 import eit.mromani.views.PhotoComponentView;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  *
@@ -13,22 +14,38 @@ import javax.swing.*;
  */
 public class PhotoComponent extends JComponent {
 
-
-    private static int DEFAULT_HEIGHT = 50;
-    private static int DEFAULT_WIDTH = 50;
-    private static int DEFAULT_PREFERRED_HEIGHT = 50;
-    private static int DEFAULT_PREFERRED_WIDTH = 50;
-
     private PhotoComponentModel model;
     private PhotoComponentView view;
+    private JPanel photo;
+    private JPanel canvas;
+    private JLabel image;
 
     public PhotoComponent() {
         setModel(new PhotoComponentModel());
         setView(new PhotoComponentView(this));
+        this.setSize(view.getSize());
+        this.setPreferredSize(view.getPreferredSize());
+        initPanels();
     }
 
-    public void paintComponent() {
+    //FIXME: display the image properly
+    public void displayImage(String path) {
+        try {
+            ImageIcon imageFile = new ImageIcon(path);
+            image = new JLabel(imageFile);
+            photo.add(image);
+        } catch (Exception exception) {
+            System.out.println("There was an error loading your image");
+            exception.printStackTrace();
+        }
+    }
 
+    public void initPanels() {
+        photo = new JPanel(new BorderLayout());
+        canvas = new JPanel(new BorderLayout());
+        photo.setBackground(Color.CYAN);
+        photo.setOpaque(true);
+        this.add(photo);
     }
 
     public void flip() {
@@ -54,5 +71,20 @@ public class PhotoComponent extends JComponent {
 
     private void setView(PhotoComponentView view) {
         this.view = view;
+    }
+
+    public PhotoComponentModel getModel() {
+        return this.model;
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return view.getPreferredSize();
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent( g );
+        view.paint(g, this);
     }
 }

@@ -1,6 +1,7 @@
 package eit.mromani.controllers;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 
@@ -21,16 +22,31 @@ public class MenuBar extends  JMenuBar{
      * Must be updated to avoid returning a null value if nothing is picked.
      * @return the chosen file the caller
      */
-    public File loadPicture() {
+    public String loadPicture() {
         JFileChooser photoPicker = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        photoPicker.setFileFilter(new FileFilter() {
+
+            public String getDescription() {
+                return "Images (*.jpg, *.png)";
+            }
+
+            public boolean accept(File f) {
+                if (f.isDirectory()) {
+                    return true;
+                } else {
+                    String filename = f.getName().toLowerCase();
+                    return filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith(".png") ;
+                }
+            }
+        });
         int pickerChoice = photoPicker.showOpenDialog(null);
         File selectedFile = null;
         if (pickerChoice == JFileChooser.APPROVE_OPTION) {
             selectedFile = photoPicker.getSelectedFile();
             System.out.println(selectedFile.getAbsolutePath());
-            return selectedFile;
+            return selectedFile.getPath();
         } else {
-            return selectedFile;
+            return selectedFile.getPath();
         }
     }
 }

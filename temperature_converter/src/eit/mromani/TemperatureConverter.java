@@ -11,6 +11,7 @@ public class TemperatureConverter extends JFrame {
     private JTextField _tempField;
     JTextField _finalTemperatureField;
     private JLabel _tempLabel;
+    private JPanel _tempPanel;
 
     public TemperatureConverter() {
         super("Temperature Converter");
@@ -21,7 +22,7 @@ public class TemperatureConverter extends JFrame {
     }
 
     private void setupUI() {
-        JPanel tempPanel = new JPanel();
+        _tempPanel = new JPanel();
         JPanel buttonsPanel = new JPanel();
         JPanel finalTempPanel = new JPanel();
 
@@ -36,8 +37,8 @@ public class TemperatureConverter extends JFrame {
         JButton convertToFarheneitButton = new JButton("Convert to F");
         JButton convertToCelsiusButton = new JButton("Convert to C");
 
-        tempPanel.add(_tempLabel);
-        tempPanel.add(_tempField, BorderLayout.CENTER);
+        _tempPanel.add(_tempLabel);
+        _tempPanel.add(_tempField, BorderLayout.CENTER);
 
         buttonsPanel.add(convertToCelsiusButton, BorderLayout.NORTH);
         buttonsPanel.add(convertToFarheneitButton, BorderLayout.SOUTH);
@@ -62,7 +63,7 @@ public class TemperatureConverter extends JFrame {
             }
         });
 
-        this.getContentPane().add(tempPanel, BorderLayout.NORTH);
+        this.getContentPane().add(_tempPanel, BorderLayout.NORTH);
         this.getContentPane().add(finalTempPanel, BorderLayout.CENTER);
         this.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
         this.pack();

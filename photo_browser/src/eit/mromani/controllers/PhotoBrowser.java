@@ -22,8 +22,8 @@ public class PhotoBrowser extends JFrame {
     public static int MAXIMUM_HEIGHT_PX = 1600;
   
     // main components
-    private JPanel _mainContent;
     private JPanel _menuContent;
+    private JPanel _photoContainer;
     private StatusBar _statusBarContent;
     private MenuBar _mainMenuBar;
 
@@ -83,9 +83,16 @@ public class PhotoBrowser extends JFrame {
      * This function setups the main panels of the window
      */
     private void initPanels() {
-        _mainContent = new JPanel();
 
         _menuContent = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        //FIXME dimension not working
+        Dimension photoContainerSize = new Dimension(getWidth()- 20, getHeight() - 20);
+
+        _photoContainer = new JPanel();
+        _photoContainer.setBackground(Color.CYAN);
+        _photoContainer.setOpaque(true);
+        _photoContainer.setSize(photoContainerSize);
 
         _statusBarContent = new StatusBar();
 
@@ -156,13 +163,7 @@ public class PhotoBrowser extends JFrame {
         _importOption.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                File selectedFile = _mainMenuBar.loadPicture();
-                if (selectedFile != null) {
-                    _statusBarContent.showStatusMessage("Successfully loaded file: " + selectedFile);
-                } else {
-                    _statusBarContent.showStatusMessage("No file could be loaded");
-
-                }
+                importImage();
             }
         });
 
@@ -195,6 +196,21 @@ public class PhotoBrowser extends JFrame {
         });
     }
 
+    private void importImage() {
+        String filePath = _mainMenuBar.loadPicture();
+        if (filePath != null && !filePath.equals("")) {
+            _statusBarContent.showStatusMessage("Successfully loaded file: " + filePath);
+            ImageIcon image = new ImageIcon(filePath);
+            JLabel tempImage = new JLabel(image);
+            PhotoComponent photoComponent = new PhotoComponent();
+            photoComponent.displayImage(filePath);
+            _photoContainer.add(photoComponent);
+        } else {
+            _statusBarContent.showStatusMessage("No file could be loaded");
+
+        }
+    }
+
     /**
      * This function init listeners for the toolbar buttons
      */
@@ -224,7 +240,7 @@ public class PhotoBrowser extends JFrame {
      */
     private void buildWindow() {
         this.getContentPane().add(_menuContent, BorderLayout.NORTH);
-        this.getContentPane().add(_mainContent, BorderLayout.CENTER);
+        this.getContentPane().add(_photoContainer, BorderLayout.CENTER);
         this.getContentPane().add(_statusBarContent, BorderLayout.SOUTH);
         this.getContentPane().add(_toolbarButtons, BorderLayout.WEST);
         this.pack();
