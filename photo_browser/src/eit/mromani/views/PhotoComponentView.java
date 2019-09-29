@@ -15,22 +15,22 @@ import java.awt.event.MouseListener;
  */
 public class PhotoComponentView {
 
-    private static int DEFAULT_HEIGHT = 500;
-    private static int DEFAULT_WIDTH = 500;
-    private static int DEFAULT_PREFERRED_HEIGHT = 700;
-    private static int DEFAULT_PREFERRED_WIDTH = 700;
+    private static int DEFAULT_HEIGHT = 600;
+    private static int DEFAULT_WIDTH = 600;
+    private static int DEFAULT_PREFERRED_HEIGHT = 800;
+    private static int DEFAULT_PREFERRED_WIDTH = 800;
 
 
-    private PhotoComponent controller;
+    private PhotoComponent _controller;
 
 
     public PhotoComponentView(PhotoComponent controller) {
-        this.controller = controller;
+        this._controller = controller;
         setupListeners();
     }
 
         private void setupListeners() {
-        controller.addMouseListener(new MouseListener() {
+        _controller.addMouseListener(new MouseListener() {
             @Override
             public void mousePressed(MouseEvent e) {
             }
@@ -45,7 +45,7 @@ public class PhotoComponentView {
             {
                 if (event.getClickCount() == 2) {
                     System.out.println("double clicked");
-                    controller.flip();
+                    _controller.flip();
                 }
             }
         });
@@ -54,12 +54,13 @@ public class PhotoComponentView {
     public void paint(Graphics graphics, PhotoComponent photoComponent) {
         PhotoComponentModel model = photoComponent.getModel();
 
-        if(model.isFlipped()) {
-            graphics.setColor(Color.red);
+        if(!model.isFlipped()) {
+            //graphics.setColor(Color.red);
+            graphics.drawImage(_controller.getImage(),photoComponent.getX(), photoComponent.getY(), null);
         } else {
             graphics.setColor(Color.white);
+            graphics.fillRect(photoComponent.getX(), photoComponent.getY(), photoComponent.getWidth(), photoComponent.getHeight());
         }
-        graphics.fillRect(photoComponent.getX(), photoComponent.getY(), photoComponent.getWidth(), photoComponent.getHeight());
         graphics.setColor(Color.black);
         graphics.drawRect(photoComponent.getX(), photoComponent.getY(), photoComponent.getWidth(), photoComponent.getHeight());
     }

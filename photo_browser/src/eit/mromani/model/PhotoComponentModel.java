@@ -2,6 +2,7 @@ package eit.mromani.model;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
@@ -13,37 +14,43 @@ import java.util.ArrayList;
  */
 public class PhotoComponentModel {
 
-    private ArrayList<ActionListener> actionListeners = new ArrayList<>();
-    private ArrayList<ChangeListener> changeListeners = new ArrayList<>();
-    private boolean isFlipped;
+    private ArrayList<ActionListener> _actionListeners = new ArrayList<>();
+    private ArrayList<ChangeListener> _changeListeners = new ArrayList<>();
+    private boolean _isFlipped;
 
 
     public void addActionListener(ActionListener listener) {
-        this.actionListeners.add(listener);
+        this._actionListeners.add(listener);
     }
 
     public void addChangeListener(ChangeListener listener) {
-        this.changeListeners.add(listener);
+        this._changeListeners.add(listener);
     }
 
     public void flipPhoto(boolean isFlipped) {
-        if(isFlipped != this.isFlipped) {
+        if(isFlipped != this._isFlipped) {
             if(!isFlipped) {
-                //fireButton();
+                fireFlip();
             }
-            this.isFlipped = isFlipped;
+            this._isFlipped = isFlipped;
             fireChangeListener();
         }
 
     }
 
     private void fireChangeListener() {
-        for (ChangeListener listener : changeListeners) {
+        for (ChangeListener listener : _changeListeners) {
             listener.stateChanged(new ChangeEvent(this));
         }
     }
 
+    private void fireFlip() {
+        for (ActionListener listener : _actionListeners) {
+            listener.actionPerformed(new ActionEvent(this, (int) System.currentTimeMillis(), "flip"));
+        }
+    }
+
     public boolean isFlipped() {
-        return this.isFlipped;
+        return this._isFlipped;
     }
 }
