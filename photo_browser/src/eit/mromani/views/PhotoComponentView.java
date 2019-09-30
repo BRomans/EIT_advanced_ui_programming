@@ -66,7 +66,7 @@ public class PhotoComponentView {
                         _controller.add(tf);
                         tf.setVisible(true);
                         tf.requestFocusInWindow();
-                        drawAnnotation(_controller.getGraphics(), event, "Test");
+                        drawAnnotation(_controller.getGraphics(), event, "");
 
                     }
                 }
@@ -97,41 +97,42 @@ public class PhotoComponentView {
 
     public void paint(Graphics graphics, PhotoComponent photoComponent) {
         PhotoComponentModel model = photoComponent.getModel();
+        Graphics2D graphics2D = (Graphics2D) graphics;
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         if (!model.isFlipped()) {
-            //graphics.setColor(Color.red);
-            graphics.drawImage(_controller.getImage(), photoComponent.getX() + 150, photoComponent.getY() + 150, null);
+            graphics2D.drawImage(_controller.getImage(), photoComponent.getX(), photoComponent.getY(), null);
         } else {
-            graphics.setColor(Color.white);
-            graphics.fillRect(photoComponent.getX() + 150, photoComponent.getY() + 150, _controller.getImage().getWidth(), _controller.getImage().getHeight());
+            graphics2D.setColor(Color.white);
+            graphics2D.fillRect(photoComponent.getX(), photoComponent.getY(), _controller.getImage().getWidth(), _controller.getImage().getHeight());
             List<AnnotationPoint> drawingPoints = _controller.getDrawingPoints();
             for (AnnotationPoint annotationPoint : drawingPoints) {
-                drawStrokeLine(graphics, (DrawingAnnotationPoint) annotationPoint);
+                drawStrokeLine(graphics2D, (DrawingAnnotationPoint) annotationPoint);
             }
         }
-        graphics.setColor(Color.black);
-        graphics.drawRect(photoComponent.getX(), photoComponent.getY(), photoComponent.getWidth(), photoComponent.getHeight());
-
-
+        graphics2D.setColor(Color.black);
+        graphics2D.drawRect(photoComponent.getX(), photoComponent.getY(), photoComponent.getWidth(), photoComponent.getHeight());
     }
 
     public void drawAndSaveLine(int startX, int startY, int endX, int endY) {
         DrawingAnnotationPoint annotationPoint = new DrawingAnnotationPoint();
+        Graphics2D graphics2D = (Graphics2D) _controller.getGraphics();
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         annotationPoint.setCoordinateX(startX);
         annotationPoint.setCoordinateY(startY);
         annotationPoint.setEndCoordinateX(endX);
         annotationPoint.setEndCoordinateY(endY);
-        drawStrokeLine(_controller.getGraphics(), annotationPoint);
+        drawStrokeLine(graphics2D, annotationPoint);
         _controller.addPoint(annotationPoint);
         System.out.println("Saved element: " + annotationPoint.toString());
     }
 
-    public void drawStrokeLine(Graphics graphics, DrawingAnnotationPoint annotationPoint) {
-        graphics.setColor(annotationPoint.getLineColor());
+    public void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationPoint annotationPoint) {
+        graphics2D.setColor(annotationPoint.getLineColor());
+        graphics2D.drawLine(annotationPoint.getCoordinateX(),
+                        annotationPoint.getCoordinateY(),
+                        annotationPoint.getEndCoordinateX(),
+                        annotationPoint.getEndCoordinateY());
 
-        graphics.drawLine(annotationPoint.getCoordinateX(),
-                annotationPoint.getCoordinateY(),
-                annotationPoint.getEndCoordinateX(),
-                annotationPoint.getEndCoordinateY());
 
     }
 
