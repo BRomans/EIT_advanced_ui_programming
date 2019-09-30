@@ -77,6 +77,10 @@ public class PhotoComponent extends JComponent {
         return this._image;
     }
 
+    public boolean getFlipState() {
+        return _model.isFlipped();
+    }
+
     @Override
     public Dimension getPreferredSize() {
         return _view.getPreferredSize();
