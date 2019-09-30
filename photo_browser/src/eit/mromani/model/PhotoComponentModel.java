@@ -5,6 +5,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -16,6 +17,9 @@ public class PhotoComponentModel {
 
     private ArrayList<ActionListener> _actionListeners = new ArrayList<>();
     private ArrayList<ChangeListener> _changeListeners = new ArrayList<>();
+    private ArrayList<AnnotationPoint> _drawingPoints = new ArrayList<>();
+    private ArrayList<AnnotationPoint> _textPoints = new ArrayList<>();
+
     private boolean _isFlipped;
 
 
@@ -26,6 +30,14 @@ public class PhotoComponentModel {
     public void addChangeListener(ChangeListener listener) {
         this._changeListeners.add(listener);
     }
+
+    public void addDrawingPoint(AnnotationPoint annotationPoint) { this._drawingPoints.add(annotationPoint);}
+
+    public void addTextPoint(AnnotationPoint annotationPoint) { this._textPoints.add(annotationPoint);}
+
+    public List<AnnotationPoint> getDrawingPoints() { return this._drawingPoints; }
+
+    public List<AnnotationPoint> getTextPoints() { return this._textPoints; }
 
     public void flipPhoto(boolean isFlipped) {
         if(isFlipped != this._isFlipped) {

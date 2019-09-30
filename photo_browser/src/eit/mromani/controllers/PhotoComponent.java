@@ -1,6 +1,9 @@
 package eit.mromani.controllers;
 
+import eit.mromani.model.AnnotationPoint;
+import eit.mromani.model.DrawingAnnotationPoint;
 import eit.mromani.model.PhotoComponentModel;
+import eit.mromani.model.TextAnnotationPoint;
 import eit.mromani.views.PhotoComponentView;
 
 import javax.imageio.ImageIO;
@@ -8,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
+
 
 /**
  *
@@ -26,17 +31,11 @@ public class PhotoComponent extends JComponent {
         setView(new PhotoComponentView(this));
         this.setSize(_view.getSize());
         this.setPreferredSize(_view.getPreferredSize());
-       // initPanels();
     }
 
-    //FIXME: display the _image properly
-    public void displayImage(String path) {
+    public void renderImage(String path) {
         try {
-            /*ImageIcon imageFile = new ImageIcon(path);
-            JLabel imageLabel = new JLabel(imageFile);
-            _image = imageFile.getImage();*/
             _image = ImageIO.read(new File(path));
-
         } catch (Exception exception) {
             System.out.println("There was an error loading your image");
             exception.printStackTrace();
@@ -64,6 +63,31 @@ public class PhotoComponent extends JComponent {
         model.addActionListener(event -> repaint());
         model.addChangeListener(event -> repaint());
     }
+
+    public void addPoint(AnnotationPoint annotationPoint) {
+        if(annotationPoint instanceof DrawingAnnotationPoint) {
+            _model.addDrawingPoint(annotationPoint);
+        } else if (annotationPoint instanceof TextAnnotationPoint) {
+            _model.addTextPoint(annotationPoint);
+        }
+    }
+
+    public List<AnnotationPoint> getDrawingPoints() {
+        return _model.getDrawingPoints();
+    }
+
+    public List<AnnotationPoint> getTextPoints() {
+        return _model.getTextPoints();
+    }
+
+    public int getPhotoComponentX() {
+        return this.getX();
+    }
+
+    public int getPhotoComponentY() {
+        return this.getY();
+    }
+
 
     private void setView(PhotoComponentView view) {
         this._view = view;
