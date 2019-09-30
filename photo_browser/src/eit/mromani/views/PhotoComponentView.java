@@ -7,6 +7,7 @@ import eit.mromani.model.PhotoComponentModel;
 import eit.mromani.model.TextAnnotationPoint;
 
 import javax.swing.*;
+import javax.xml.soap.Text;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -66,7 +67,7 @@ public class PhotoComponentView {
                         _controller.add(tf);
                         tf.setVisible(true);
                         tf.requestFocusInWindow();
-                        drawAnnotation(_controller.getGraphics(), event, "");
+                        drawAndSaveAnnotation(_controller.getGraphics(), event, "test");
 
                     }
                 }
@@ -105,9 +106,14 @@ public class PhotoComponentView {
             graphics2D.setColor(Color.white);
             graphics2D.fillRect(photoComponent.getX(), photoComponent.getY(), _controller.getImage().getWidth(), _controller.getImage().getHeight());
             List<AnnotationPoint> drawingPoints = _controller.getDrawingPoints();
+            List<AnnotationPoint> textPoints = _controller.getTextPoints();
             for (AnnotationPoint annotationPoint : drawingPoints) {
                 drawStrokeLine(graphics2D, (DrawingAnnotationPoint) annotationPoint);
             }
+            for (AnnotationPoint annotationPoint : textPoints) {
+                drawAnnotation(graphics2D, (TextAnnotationPoint) annotationPoint);
+            }
+
         }
         graphics2D.setColor(Color.black);
         graphics2D.drawRect(photoComponent.getX(), photoComponent.getY(), photoComponent.getWidth(), photoComponent.getHeight());
@@ -123,7 +129,7 @@ public class PhotoComponentView {
         annotationPoint.setEndCoordinateY(endY);
         drawStrokeLine(graphics2D, annotationPoint);
         _controller.addPoint(annotationPoint);
-        System.out.println("Saved element: " + annotationPoint.toString());
+        //System.out.println("Saved element: " + annotationPoint.toString());
     }
 
     public void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationPoint annotationPoint) {
@@ -136,12 +142,19 @@ public class PhotoComponentView {
 
     }
 
-    public void drawAnnotation(Graphics graphics, MouseEvent mouseEvent, String text) {
+    public void drawAndSaveAnnotation(Graphics graphics, MouseEvent mouseEvent, String text) {
         TextAnnotationPoint annotationPoint = new TextAnnotationPoint();
-        graphics.drawString(text, mouseEvent.getX(), mouseEvent.getY());
         annotationPoint.setAnnotationText(text);
         annotationPoint.setCoordinateX(mouseEvent.getX());
         annotationPoint.setCoordinateY(mouseEvent.getY());
+        drawAnnotation(graphics, annotationPoint);
+        _controller.addPoint(annotationPoint);
+    }
+
+    public void drawAnnotation(Graphics graphics, TextAnnotationPoint annotationPoint) {
+        graphics.drawString(annotationPoint.getAnnotationText(),
+                    annotationPoint.getCoordinateX(),
+                    annotationPoint.getCoordinateY());
     }
 
     public Dimension getSize() {
