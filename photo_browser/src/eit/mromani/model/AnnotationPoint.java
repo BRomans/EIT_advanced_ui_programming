@@ -2,6 +2,7 @@ package eit.mromani.model;
 
 import java.awt.*;
 
+
 public interface AnnotationPoint {
 
 

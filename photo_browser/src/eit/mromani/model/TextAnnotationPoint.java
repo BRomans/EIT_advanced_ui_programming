@@ -1,12 +1,14 @@
 package eit.mromani.model;
 
+import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
-public class TextAnnotationPoint implements AnnotationPoint {
+public class TextAnnotationPoint extends JComponent implements AnnotationPoint {
 
     private int _coordinateX;
     private int _coordinateY;
-    private String _annotationText;
+    private ArrayList<Character> _annotationText = new ArrayList<>();
     private Color _lineColor;
 
     @Override
@@ -30,9 +32,18 @@ public class TextAnnotationPoint implements AnnotationPoint {
     }
 
 
-    public String getAnnotationText() {
+    public ArrayList<Character> getAnnotationText() {
         return this._annotationText;
     }
+
+    public void setAnnotationText(ArrayList<Character> annotationText) {
+        this._annotationText = annotationText;
+    }
+
+    public void addCharachter(Character character) {
+        this._annotationText.add(character);
+    }
+
 
     @Override
     public void setCoordinateX(int coordinateX) {
@@ -44,9 +55,6 @@ public class TextAnnotationPoint implements AnnotationPoint {
         this._coordinateY = coordinateY;
     }
 
-    public void setAnnotationText(String annotationText) {
-        this._annotationText = annotationText;
-    }
 
     @Override
     public String toString() {
@@ -57,4 +65,5 @@ public class TextAnnotationPoint implements AnnotationPoint {
                 ", _lineColor=" + _lineColor +
                 '}';
     }
+
 }
