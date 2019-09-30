@@ -4,69 +4,71 @@ import java.awt.*;
 
 public class DrawingAnnotationPoint implements AnnotationPoint {
 
-    private int coordinateX;
-    private int coordinateY;
+    private int _coordinateX;
+    private int _coordinateY;
+    private int _endCoordinateX;
+    private int _endCoordinateY;
+    private Color _lineColor;
 
     public int getEndCoordinateX() {
-        return endCoordinateX;
+        return _endCoordinateX;
     }
 
     public void setEndCoordinateX(int endCoordinateX) {
-        this.endCoordinateX = endCoordinateX;
+        this._endCoordinateX = endCoordinateX;
     }
 
     public int getEndCoordinateY() {
-        return endCoordinateY;
+        return _endCoordinateY;
     }
 
     public void setEndCoordinateY(int endCoordinateY) {
-        this.endCoordinateY = endCoordinateY;
+        this._endCoordinateY = endCoordinateY;
     }
 
-    private int endCoordinateX;
-    private int endCoordinateY;
-    private Color lineColor;
-
     public DrawingAnnotationPoint() {
-        lineColor = Color.BLACK;
+        _lineColor = Color.BLACK;
     }
 
     @Override
     public int getCoordinateX() {
-        return this.coordinateX;
+        return this._coordinateX;
     }
 
     @Override
     public int getCoordinateY() {
-        return this.coordinateY;
+        return this._coordinateY;
     }
 
+    @Override
     public Color getLineColor() {
-        return this.lineColor;
+        return this._lineColor;
+    }
+
+    @Override
+    public void setLineColor(Color color) {
+        this._lineColor = color;
     }
 
     @Override
     public void setCoordinateX(int coordinateX) {
-        this.coordinateX = coordinateX;
+        this._coordinateX = coordinateX;
     }
 
     @Override
     public void setCoordinateY(int coordinateY) {
-        this.coordinateY = coordinateY;
+        this._coordinateY = coordinateY;
     }
 
-    public void setLineColor(Color color) {
-        this.lineColor = color;
-    }
 
     @Override
     public String toString() {
         return "DrawingAnnotationPoint{" +
-                "coordinateX=" + coordinateX +
-                ", coordinateY=" + coordinateY +
-                ", endCoordinateX=" + endCoordinateX +
-                ", endCoordinateY=" + endCoordinateY +
-                ", lineColor=" + lineColor +
+                "_coordinateX=" + _coordinateX +
+                ", _coordinateY=" + _coordinateY +
+                ", _endCoordinateX=" + _endCoordinateX +
+                ", _endCoordinateY=" + _endCoordinateY +
+                ", _lineColor=" + _lineColor +
                 '}';
     }
 }

@@ -67,7 +67,7 @@ public class PhotoComponentView {
                         _controller.add(tf);
                         tf.setVisible(true);
                         tf.requestFocusInWindow();
-                        drawAndSaveAnnotation(_controller.getGraphics(), event, "test");
+                        drawAndSaveAnnotation((Graphics2D)_controller.getGraphics(), event, "test");
 
                     }
                 }
@@ -107,12 +107,13 @@ public class PhotoComponentView {
             graphics2D.fillRect(photoComponent.getX(), photoComponent.getY(), _controller.getImage().getWidth(), _controller.getImage().getHeight());
             List<AnnotationPoint> drawingPoints = _controller.getDrawingPoints();
             List<AnnotationPoint> textPoints = _controller.getTextPoints();
-            for (AnnotationPoint annotationPoint : drawingPoints) {
-                drawStrokeLine(graphics2D, (DrawingAnnotationPoint) annotationPoint);
-            }
             for (AnnotationPoint annotationPoint : textPoints) {
                 drawAnnotation(graphics2D, (TextAnnotationPoint) annotationPoint);
             }
+            for (AnnotationPoint annotationPoint : drawingPoints) {
+                drawStrokeLine(graphics2D, (DrawingAnnotationPoint) annotationPoint);
+            }
+
 
         }
         graphics2D.setColor(Color.black);
@@ -138,21 +139,21 @@ public class PhotoComponentView {
                         annotationPoint.getCoordinateY(),
                         annotationPoint.getEndCoordinateX(),
                         annotationPoint.getEndCoordinateY());
-
-
     }
 
-    public void drawAndSaveAnnotation(Graphics graphics, MouseEvent mouseEvent, String text) {
+    public void drawAndSaveAnnotation(Graphics2D graphics2D, MouseEvent mouseEvent, String text) {
         TextAnnotationPoint annotationPoint = new TextAnnotationPoint();
+        annotationPoint.setLineColor(Color.black);
         annotationPoint.setAnnotationText(text);
         annotationPoint.setCoordinateX(mouseEvent.getX());
         annotationPoint.setCoordinateY(mouseEvent.getY());
-        drawAnnotation(graphics, annotationPoint);
+        drawAnnotation(graphics2D, annotationPoint);
         _controller.addPoint(annotationPoint);
     }
 
-    public void drawAnnotation(Graphics graphics, TextAnnotationPoint annotationPoint) {
-        graphics.drawString(annotationPoint.getAnnotationText(),
+    public void drawAnnotation(Graphics2D graphics2D, TextAnnotationPoint annotationPoint) {
+        graphics2D.setColor(annotationPoint.getLineColor());
+        graphics2D.drawString(annotationPoint.getAnnotationText(),
                     annotationPoint.getCoordinateX(),
                     annotationPoint.getCoordinateY());
     }
