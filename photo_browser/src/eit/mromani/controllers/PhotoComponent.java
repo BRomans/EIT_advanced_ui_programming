@@ -1,9 +1,8 @@
 package eit.mromani.controllers;
 
-import eit.mromani.model.AnnotationPoint;
-import eit.mromani.model.DrawingAnnotationPoint;
-import eit.mromani.model.PhotoComponentModel;
-import eit.mromani.model.TextAnnotationPoint;
+import eit.mromani.model.*;
+import eit.mromani.model.AnnotationModel;
+import eit.mromani.model.DrawingAnnotationModel;
 import eit.mromani.views.PhotoComponentView;
 
 import javax.imageio.ImageIO;
@@ -64,19 +63,19 @@ public class PhotoComponent extends JComponent {
         model.addChangeListener(event -> repaint());
     }
 
-    public void addPoint(AnnotationPoint annotationPoint) {
-        if(annotationPoint instanceof DrawingAnnotationPoint) {
-            _model.addDrawingPoint(annotationPoint);
-        } else if (annotationPoint instanceof TextAnnotationPoint) {
-            _model.addTextPoint(annotationPoint);
+    public void addPoint(AnnotationModel annotationModel) {
+        if(annotationModel instanceof DrawingAnnotationModel) {
+            _model.addDrawingPoint(annotationModel);
+        } else if (annotationModel instanceof TextAnnotationModel) {
+            _model.addTextPoint(annotationModel);
         }
     }
 
-    public List<AnnotationPoint> getDrawingPoints() {
+    public List<AnnotationModel> getDrawingPoints() {
         return _model.getDrawingPoints();
     }
 
-    public List<AnnotationPoint> getTextPoints() {
+    public List<AnnotationModel> getTextPoints() {
         return _model.getTextPoints();
     }
 

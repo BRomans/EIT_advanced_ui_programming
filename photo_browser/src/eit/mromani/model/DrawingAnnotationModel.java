@@ -2,7 +2,7 @@ package eit.mromani.model;
 
 import java.awt.*;
 
-public class DrawingAnnotationPoint implements AnnotationPoint {
+public class DrawingAnnotationModel implements AnnotationModel {
 
     private int _coordinateX;
     private int _coordinateY;
@@ -26,7 +26,7 @@ public class DrawingAnnotationPoint implements AnnotationPoint {
         this._endCoordinateY = endCoordinateY;
     }
 
-    public DrawingAnnotationPoint() {
+    public DrawingAnnotationModel() {
         _lineColor = Color.BLACK;
     }
 
@@ -63,7 +63,7 @@ public class DrawingAnnotationPoint implements AnnotationPoint {
 
     @Override
     public String toString() {
-        return "DrawingAnnotationPoint{" +
+        return "DrawingAnnotationModel{" +
                 "_coordinateX=" + _coordinateX +
                 ", _coordinateY=" + _coordinateY +
                 ", _endCoordinateX=" + _endCoordinateX +

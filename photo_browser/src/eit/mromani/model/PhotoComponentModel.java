@@ -17,8 +17,8 @@ public class PhotoComponentModel {
 
     private ArrayList<ActionListener> _actionListeners = new ArrayList<>();
     private ArrayList<ChangeListener> _changeListeners = new ArrayList<>();
-    private ArrayList<AnnotationPoint> _drawingPoints = new ArrayList<>();
-    private ArrayList<AnnotationPoint> _textPoints = new ArrayList<>();
+    private ArrayList<AnnotationModel> _drawingPoints = new ArrayList<>();
+    private ArrayList<AnnotationModel> _textPoints = new ArrayList<>();
 
     private boolean _isFlipped;
 
@@ -31,13 +31,13 @@ public class PhotoComponentModel {
         this._changeListeners.add(listener);
     }
 
-    public void addDrawingPoint(AnnotationPoint annotationPoint) { this._drawingPoints.add(annotationPoint);}
+    public void addDrawingPoint(AnnotationModel annotationModel) { this._drawingPoints.add(annotationModel);}
 
-    public void addTextPoint(AnnotationPoint annotationPoint) { this._textPoints.add(annotationPoint);}
+    public void addTextPoint(AnnotationModel annotationModel) { this._textPoints.add(annotationModel);}
 
-    public List<AnnotationPoint> getDrawingPoints() { return this._drawingPoints; }
+    public List<AnnotationModel> getDrawingPoints() { return this._drawingPoints; }
 
-    public List<AnnotationPoint> getTextPoints() { return this._textPoints; }
+    public List<AnnotationModel> getTextPoints() { return this._textPoints; }
 
     public void flipPhoto(boolean isFlipped) {
         if(isFlipped != this._isFlipped) {
