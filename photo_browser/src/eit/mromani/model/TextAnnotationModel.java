@@ -1,21 +1,25 @@
 package eit.mromani.model;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class TextAnnotationModel implements AnnotationModel {
 
     private int _coordinateX;
     private int _coordinateY;
-    private ArrayList<ActionListener> _actionListeners = new ArrayList<>();
-    private ArrayList<ChangeListener> _changeListeners = new ArrayList<>();
+/*    private ArrayList<ActionListener> _actionListeners = new ArrayList<>();
+    private ArrayList<ChangeListener> _changeListeners = new ArrayList<>();*/
     private ArrayList<String> _annotationText = new ArrayList<>();
-    private String _currentWord;
+    private String _currentLine = "";
     private Color _lineColor;
+
+    public TextAnnotationModel(MouseEvent mouseEvent) {
+            setLineColor(Color.black);
+            setCoordinateX(mouseEvent.getX());
+            setCoordinateY(mouseEvent.getY());
+            addLine("");
+    }
 
     @Override
     public int getCoordinateX() {
@@ -52,17 +56,20 @@ public class TextAnnotationModel implements AnnotationModel {
         this._coordinateY = coordinateY;
     }
 
-    public String getCurrentWord() { return this._currentWord; }
+    public String getLastLine() { return this._annotationText.get(_annotationText.size()-1); }
 
     public void addCharacterToWord(Character character) {
-        if(character != ' ') {
-            this._currentWord = this._currentWord + character;
+        String lastLine = getLastLine();
+        if(character != '\n') {
+            lastLine = lastLine + (String.valueOf(character));
+            this._annotationText.add(_annotationText.size()-1, lastLine);
         } else {
-            addLine(this._currentWord);
-            this._currentWord = "";
+            lastLine = String.valueOf(character);
+            addLine(lastLine);
         }
     }
 
+/*
     public void addActionListener(ActionListener listener) {
         this._actionListeners.add(listener);
     }
@@ -70,6 +77,7 @@ public class TextAnnotationModel implements AnnotationModel {
     public void addChangeListener(ChangeListener listener) {
         this._changeListeners.add(listener);
     }
+*/
 
     public void setAnnotationText(ArrayList<String> annotationText) {
         this._annotationText = annotationText;
@@ -78,7 +86,7 @@ public class TextAnnotationModel implements AnnotationModel {
     public void addLine(String line) {
         this._annotationText.add(line);
     }
-
+/*
     private void fireChangeListener() {
         for (ChangeListener listener : _changeListeners) {
             listener.stateChanged(new ChangeEvent(this));
@@ -87,9 +95,9 @@ public class TextAnnotationModel implements AnnotationModel {
 
     private void fireDrawLine() {
         for (ActionListener listener : _actionListeners) {
-            listener.actionPerformed(new ActionEvent(this, (int) System.currentTimeMillis(), "drawLine"));
+            listener.actionPerformed(new ActionEvent(this, (int) System.currentTimeMillis(), "drawCharacter"));
         }
-    }
+    }*/
 
     @Override
     public String toString() {

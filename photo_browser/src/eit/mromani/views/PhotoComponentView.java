@@ -36,34 +36,18 @@ public class PhotoComponentView {
     }
 
     private void setupListeners() {
-        _controller.addMouseListener(new MouseListener() {
+        _controller.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
                 start_position_x = mouseEvent.getX();
                 start_position_y = mouseEvent.getY();
             }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-
             public void mouseClicked(MouseEvent mouseEvent) {
                 if (mouseEvent.getClickCount() == 1) {
                     System.out.println("single clicked");
-
                     if (_controller.getFlipState()) {
-                        start_position_x = mouseEvent.getX();
-                        start_position_y = mouseEvent.getY();
-                        _controller.requestFocus();
-                        initAnnotation(mouseEvent);
+                        initTextAnnotation(mouseEvent);
                     }
                 }
                 if (mouseEvent.getClickCount() == 2) {
@@ -73,7 +57,7 @@ public class PhotoComponentView {
             }
         });
 
-        _controller.addMouseMotionListener(new MouseMotionListener() {
+        _controller.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent event) {
                 if (_controller.getFlipState()) {
@@ -83,31 +67,30 @@ public class PhotoComponentView {
                     start_position_y = event.getY();
                 }
             }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-
-            }
         });
 
-        _controller.addKeyListener(new KeyListener() {
+        _controller.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent event) {
                 Character keyValue = event.getKeyChar();
                 System.out.println("Key pressed: " + keyValue);
                 _currentAnnotation.addCharacterToWord(keyValue);
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
+                _controller.repaint();
             }
         });
+    }
+
+    private void evaluateMouseClick(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount() == 1) {
+            System.out.println("single clicked");
+            if (_controller.getFlipState()) {
+                initTextAnnotation(mouseEvent);
+            }
+        }
+        if (mouseEvent.getClickCount() == 2) {
+            System.out.println("double clicked");
+            _controller.flip();
+        }
     }
 
     public void paint(Graphics graphics, PhotoComponent photoComponent) {
@@ -145,56 +128,58 @@ public class PhotoComponentView {
     }
 
     public void drawAndSaveLine(int startX, int startY, int endX, int endY) {
-        DrawingAnnotationModel annotationPoint = new DrawingAnnotationModel();
+        DrawingAnnotationModel annotationModel = new DrawingAnnotationModel();
         Graphics2D graphics2D = (Graphics2D) _controller.getGraphics();
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        annotationPoint.setCoordinateX(startX);
-        annotationPoint.setCoordinateY(startY);
-        annotationPoint.setEndCoordinateX(endX);
-        annotationPoint.setEndCoordinateY(endY);
-        drawStrokeLine(graphics2D, annotationPoint);
-        _controller.addPoint(annotationPoint);
+        annotationModel.setCoordinateX(startX);
+        annotationModel.setCoordinateY(startY);
+        annotationModel.setEndCoordinateX(endX);
+        annotationModel.setEndCoordinateY(endY);
+        drawStrokeLine(graphics2D, annotationModel);
+        _controller.addAnnotationModel(annotationModel);
         //System.out.println("Saved element: " + annotationPoint.toString());
     }
 
-    public void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationModel annotationPoint) {
-        boolean startPointValid = isOnThePicture(annotationPoint.getCoordinateX(),
-                annotationPoint.getCoordinateY());
-        boolean endPointValid = isOnThePicture(annotationPoint.getEndCoordinateX(),
-                annotationPoint.getEndCoordinateY());
+    public void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationModel annotationModel) {
+        boolean startPointValid = isOnThePicture(annotationModel.getCoordinateX(),
+                annotationModel.getCoordinateY());
+        boolean endPointValid = isOnThePicture(annotationModel.getEndCoordinateX(),
+                annotationModel.getEndCoordinateY());
         if(startPointValid && endPointValid) {
-            graphics2D.setColor(annotationPoint.getLineColor());
-            graphics2D.drawLine(annotationPoint.getCoordinateX(),
-                    annotationPoint.getCoordinateY(),
-                    annotationPoint.getEndCoordinateX(),
-                    annotationPoint.getEndCoordinateY());
+            graphics2D.setColor(annotationModel.getLineColor());
+            graphics2D.drawLine(annotationModel.getCoordinateX(),
+                    annotationModel.getCoordinateY(),
+                    annotationModel.getEndCoordinateX(),
+                    annotationModel.getEndCoordinateY());
         }
     }
 
-    //TODO evaluate refactoring and removing this function
-    public void initAnnotation(MouseEvent mouseEvent) {
-        _currentAnnotation = new TextAnnotationModel();
-        _currentAnnotation.setLineColor(Color.black);
-        _currentAnnotation.setCoordinateX(mouseEvent.getX());
-        _currentAnnotation.setCoordinateY(mouseEvent.getY());
+    private void initTextAnnotation(MouseEvent mouseEvent) {
+        start_position_x = mouseEvent.getX();
+        start_position_y = mouseEvent.getY();
+        _controller.requestFocus();
+        TextAnnotationModel annotationModel = new TextAnnotationModel(mouseEvent);
+        saveTextAnnotation(annotationModel);
+        _currentAnnotation = annotationModel;
+    }
 
+    private void saveTextAnnotation(TextAnnotationModel annotationModel) {
+        _controller.addAnnotationModel(annotationModel);
     }
 
     //FIXME rewrite draw function
-    public void drawAnnotation(Graphics2D graphics2D, TextAnnotationModel annotationPoint) {
+    private void drawAnnotation(Graphics2D graphics2D, TextAnnotationModel annotationPoint) {
+        List<String> annotationText = annotationPoint.getAnnotationText();
         graphics2D.setColor(annotationPoint.getLineColor());
-        graphics2D.drawString("",
-                    annotationPoint.getCoordinateX(),
-                    annotationPoint.getCoordinateY());
-    }
+        StringBuilder rawText = new StringBuilder();
+        for(String line : annotationText) {
+            rawText.append(line).append("\n");
+        }
+        graphics2D.drawString(rawText.toString(),
+                annotationPoint.getCoordinateX(),
+                annotationPoint.getCoordinateY());
 
-    //TODO remove obsolete function
-/*    public void drawAnnotationLetter(Graphics2D graphics2D, Character character, int startX, int startY) {
-        graphics2D.setColor(Color.black);
-        graphics2D.drawString(String.valueOf(character),
-                startX,
-                startY);
-    }*/
+    }
 
     public Dimension getSize() {
         return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);

@@ -63,7 +63,7 @@ public class PhotoComponent extends JComponent {
         model.addChangeListener(event -> repaint());
     }
 
-    public void addPoint(AnnotationModel annotationModel) {
+    public void addAnnotationModel(AnnotationModel annotationModel) {
         if(annotationModel instanceof DrawingAnnotationModel) {
             _model.addDrawingPoint(annotationModel);
         } else if (annotationModel instanceof TextAnnotationModel) {
@@ -111,6 +111,7 @@ public class PhotoComponent extends JComponent {
 
     @Override
     public void paintComponent(Graphics g) {
+        System.out.println("Repaint triggered!");
         _view.paint(g, this);
     }
 }
