@@ -72,10 +72,12 @@ public class PhotoComponentView {
         _controller.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent event) {
-                Character keyValue = event.getKeyChar();
-                System.out.println("Key pressed: " + keyValue);
-                _currentAnnotation.addCharacterToWord(keyValue);
-                _controller.repaint();
+                if (_controller.getFlipState()) {
+                    Character keyValue = event.getKeyChar();
+                    System.out.println("Key pressed: " + keyValue);
+                    _currentAnnotation.addCharacterToWord(keyValue);
+                    _controller.repaint();
+                }
             }
         });
     }
