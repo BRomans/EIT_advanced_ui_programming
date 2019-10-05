@@ -112,6 +112,7 @@ public class PhotoComponent extends JComponent {
     @Override
     public void paintComponent(Graphics g) {
         System.out.println("Repaint triggered!");
+        super.paintComponent(g);
         _view.paint(g, this);
     }
 }

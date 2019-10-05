@@ -2,23 +2,41 @@ package eit.mromani.model;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.TextAttribute;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class TextAnnotationModel implements AnnotationModel {
 
     private int _coordinateX;
     private int _coordinateY;
-/*    private ArrayList<ActionListener> _actionListeners = new ArrayList<>();
-    private ArrayList<ChangeListener> _changeListeners = new ArrayList<>();*/
+    /*    private ArrayList<ActionListener> _actionListeners = new ArrayList<>();
+        private ArrayList<ChangeListener> _changeListeners = new ArrayList<>();*/
     private ArrayList<String> _annotationText = new ArrayList<>();
-    private String _currentLine = "";
+    private String _currentLine = " ";
+    private int _lineIndex = 0;
     private Color _lineColor;
+    private static final
+    Hashtable<TextAttribute, Object> map =
+            new Hashtable<TextAttribute, Object>();
+
+    static {
+        map.put(TextAttribute.FAMILY, "Serif");
+        map.put(TextAttribute.SIZE, new Float(18.0));
+    }
+
+    private AttributedString _currentLineIterator = new AttributedString(
+            _currentLine,
+            map);
 
     public TextAnnotationModel(MouseEvent mouseEvent) {
-            setLineColor(Color.black);
-            setCoordinateX(mouseEvent.getX());
-            setCoordinateY(mouseEvent.getY());
-            addLine("");
+        setLineColor(Color.black);
+        setCoordinateX(mouseEvent.getX());
+        setCoordinateY(mouseEvent.getY());
+        String emptyLine = "";
+        addLine(emptyLine);
     }
 
     @Override
@@ -56,17 +74,33 @@ public class TextAnnotationModel implements AnnotationModel {
         this._coordinateY = coordinateY;
     }
 
-    public String getLastLine() { return this._annotationText.get(_annotationText.size()-1); }
+    public String getLastLine() {
+        return this._annotationText.get(_lineIndex);
+    }
 
-    public void addCharacterToWord(Character character) {
-        String lastLine = getLastLine();
-        if(character != '\n') {
-            lastLine = lastLine + (String.valueOf(character));
-            this._annotationText.add(_annotationText.size()-1, lastLine);
+    public AttributedString getCurrentLineIterator() {
+        return this._currentLineIterator;
+    }
+
+    public void processNewCharacter(Character character) {
+        //String lastLine = getLastLine();
+        String currentline = getLastLine();
+        if(character == '\b'){
+            _currentLine = removeLastChar(_currentLine);
         } else {
-            lastLine = String.valueOf(character);
-            addLine(lastLine);
+            _currentLine = addCharacter(_currentLine, character);
         }
+        _currentLineIterator = new AttributedString(_currentLine, map);
+
+  /*      if (character != '\n') {
+            //this._annotationText.add(_annotationText.size()-1, lastLine);
+            //addLine(_lineIndex, currentline);
+        } else {
+            String newLine = "";
+            _lineIndex++;
+            addLine(_lineIndex, newLine);
+            //lastLine = String.valueOf(character);
+        }*/
     }
 
 /*
@@ -77,7 +111,16 @@ public class TextAnnotationModel implements AnnotationModel {
     public void addChangeListener(ChangeListener listener) {
         this._changeListeners.add(listener);
     }
+
 */
+
+    private String removeLastChar(String str) {
+        return str.substring(0, str.length() - 1);
+    }
+
+    private String addCharacter(String str, char character) {
+        return str + String.valueOf(character);
+    }
 
     public void setAnnotationText(ArrayList<String> annotationText) {
         this._annotationText = annotationText;
@@ -85,6 +128,10 @@ public class TextAnnotationModel implements AnnotationModel {
 
     public void addLine(String line) {
         this._annotationText.add(line);
+    }
+
+    public void addLine(int index, String line) {
+        this._annotationText.add(index, line);
     }
 /*
     private void fireChangeListener() {

@@ -7,6 +7,10 @@ import eit.mromani.model.DrawingAnnotationModel;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextLayout;
+import java.text.AttributedCharacterIterator;
 import java.util.List;
 
 /**
@@ -26,6 +30,15 @@ public class PhotoComponentView {
     private int end_position_x;
     private int end_position_y;
 
+    // The LineBreakMeasurer used to line-break the paragraph.
+    private LineBreakMeasurer lineMeasurer;
+
+    // index of the first character in the paragraph.
+    private int paragraphStart;
+
+    // index of the first character after the end of the paragraph.
+    private int paragraphEnd;
+
     private PhotoComponent _controller;
 
     private TextAnnotationModel _currentAnnotation;
@@ -36,6 +49,7 @@ public class PhotoComponentView {
     }
 
     private void setupListeners() {
+
         _controller.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent mouseEvent) {
@@ -75,7 +89,7 @@ public class PhotoComponentView {
                 if (_controller.getFlipState()) {
                     Character keyValue = event.getKeyChar();
                     System.out.println("Key pressed: " + keyValue);
-                    _currentAnnotation.addCharacterToWord(keyValue);
+                    _currentAnnotation.processNewCharacter(keyValue);
                     _controller.repaint();
                 }
             }
@@ -120,10 +134,10 @@ public class PhotoComponentView {
     public boolean isOnThePicture(int coordinateX, int coordinateY) {
         boolean horizontalValid = false;
         boolean verticalValid = false;
-        if(coordinateX < _controller.getImage().getWidth() + _controller.getX()) {
+        if (coordinateX < _controller.getImage().getWidth() + _controller.getX()) {
             horizontalValid = true;
         }
-        if(coordinateY < _controller.getImage().getHeight() + _controller.getY()) {
+        if (coordinateY < _controller.getImage().getHeight() + _controller.getY()) {
             verticalValid = true;
         }
         return horizontalValid && verticalValid;
@@ -147,7 +161,7 @@ public class PhotoComponentView {
                 annotationModel.getCoordinateY());
         boolean endPointValid = isOnThePicture(annotationModel.getEndCoordinateX(),
                 annotationModel.getEndCoordinateY());
-        if(startPointValid && endPointValid) {
+        if (startPointValid && endPointValid) {
             graphics2D.setColor(annotationModel.getLineColor());
             graphics2D.drawLine(annotationModel.getCoordinateX(),
                     annotationModel.getCoordinateY(),
@@ -171,16 +185,59 @@ public class PhotoComponentView {
 
     //FIXME rewrite draw function
     private void drawAnnotation(Graphics2D graphics2D, TextAnnotationModel annotationPoint) {
-        List<String> annotationText = annotationPoint.getAnnotationText();
         graphics2D.setColor(annotationPoint.getLineColor());
-        StringBuilder rawText = new StringBuilder();
-        for(String line : annotationText) {
-            rawText.append(line).append("\n");
+
+        if (lineMeasurer == null) {
+            AttributedCharacterIterator paragraph = annotationPoint.getCurrentLineIterator().getIterator();
+            paragraphStart = paragraph.getBeginIndex();
+            paragraphEnd = paragraph.getEndIndex();
+            FontRenderContext frc = graphics2D.getFontRenderContext();
+            lineMeasurer = new LineBreakMeasurer(paragraph, frc);
         }
-        graphics2D.drawString(rawText.toString(),
+
+        // Set break width to width of Component.
+        float breakWidth = (float)_controller.getImage().getWidth();
+        float drawPosY = annotationPoint.getCoordinateY();
+        // Set position to the index of the first character in the paragraph.
+        lineMeasurer.setPosition(paragraphStart);
+
+        // Get lines until the entire paragraph has been displayed.
+        while (lineMeasurer.getPosition() < paragraphEnd) {
+
+            // Retrieve next layout. A cleverer program would also cache
+            // these layouts until the component is re-sized.
+            TextLayout layout = lineMeasurer.nextLayout(breakWidth);
+
+            // Compute pen x position. If the paragraph is right-to-left we
+            // will align the TextLayouts to the right edge of the panel.
+            // Note: this won't occur for the English text in this sample.
+            // Note: drawPosX is always where the LEFT of the text is placed.
+            float drawPosX = layout.isLeftToRight()
+                    ? annotationPoint.getCoordinateX() : breakWidth - layout.getAdvance();
+
+            // Move y-coordinate by the ascent of the layout.
+            drawPosY += layout.getAscent();
+
+            // Draw the TextLayout at (drawPosX, drawPosY).
+            layout.draw(graphics2D, drawPosX, drawPosY);
+
+            // Move y-coordinate in preparation for next layout.
+            drawPosY += layout.getDescent() + layout.getLeading();
+        }
+        lineMeasurer = null;
+
+      List<String> annotationText = annotationPoint.getAnnotationText();
+
+        /*  StringBuilder rawText = new StringBuilder();
+        for (String line : annotationText) {
+            rawText.append(line);
+            rawText.append("\n");
+        }
+
+        graphics2D.drawString(annotationPoint.getCurrentLine(),
                 annotationPoint.getCoordinateX(),
                 annotationPoint.getCoordinateY());
-
+*/
     }
 
     public Dimension getSize() {
