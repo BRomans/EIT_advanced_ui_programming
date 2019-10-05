@@ -12,17 +12,14 @@ public class TextAnnotationModel implements AnnotationModel {
     private int _coordinateX;
     private int _coordinateY;
     private ArrayList<String> _annotationText = new ArrayList<>();
-    private String _currentLine = " ";
     private Color _lineColor;
-    private static final
+
+    private final
     Hashtable<TextAttribute, Object> map =
             new Hashtable<TextAttribute, Object>();
 
-    static {
-        map.put(TextAttribute.FAMILY, "Serif");
-        map.put(TextAttribute.SIZE, new Float(18.0));
-    }
-
+    //init the current line with an empty character that allows the AttributedString creation
+    private String _currentLine = "\0";
     private AttributedString _currentLineIterator = new AttributedString(
             _currentLine,
             map);
@@ -31,6 +28,8 @@ public class TextAnnotationModel implements AnnotationModel {
         setLineColor(Color.black);
         setCoordinateX(mouseEvent.getX());
         setCoordinateY(mouseEvent.getY());
+        map.put(TextAttribute.FAMILY, "Serif");
+        map.put(TextAttribute.SIZE, new Float(18.0));
     }
 
     @Override

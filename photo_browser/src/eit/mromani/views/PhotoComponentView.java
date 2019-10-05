@@ -182,35 +182,26 @@ public class PhotoComponentView {
         _controller.addAnnotationModel(annotationModel);
     }
 
-    //FIXME rewrite draw function
     private void drawAnnotation(Graphics2D graphics2D, TextAnnotationModel annotationPoint) {
         graphics2D.setColor(annotationPoint.getLineColor());
 
-        if (lineMeasurer == null) {
-            AttributedCharacterIterator paragraph = annotationPoint.getCurrentLineIterator().getIterator();
-            paragraphStart = paragraph.getBeginIndex();
-            paragraphEnd = paragraph.getEndIndex();
-            FontRenderContext frc = graphics2D.getFontRenderContext();
-            lineMeasurer = new LineBreakMeasurer(paragraph, frc);
-        }
+        AttributedCharacterIterator paragraph = annotationPoint.getCurrentLineIterator().getIterator();
+        paragraphStart = paragraph.getBeginIndex();
+        paragraphEnd = paragraph.getEndIndex();
+        FontRenderContext frc = graphics2D.getFontRenderContext();
+        lineMeasurer = new LineBreakMeasurer(paragraph, frc);
 
-        // Set break width to width of Component.
-        float breakWidth = (float)_controller.getImage().getWidth();
+        // we calculate the X position with the photo width and the click X coordinate
+        float breakWidth = (float) _controller.getImage().getWidth() - annotationPoint.getCoordinateX();
         float drawPosY = annotationPoint.getCoordinateY();
-        // Set position to the index of the first character in the paragraph.
         lineMeasurer.setPosition(paragraphStart);
 
-        // Get lines until the entire paragraph has been displayed.
         while (lineMeasurer.getPosition() < paragraphEnd) {
 
-            // Retrieve next layout. A cleverer program would also cache
-            // these layouts until the component is re-sized.
             TextLayout layout = lineMeasurer.nextLayout(breakWidth);
 
             // Compute pen x position. If the paragraph is right-to-left we
             // will align the TextLayouts to the right edge of the panel.
-            // Note: this won't occur for the English text in this sample.
-            // Note: drawPosX is always where the LEFT of the text is placed.
             float drawPosX = layout.isLeftToRight()
                     ? annotationPoint.getCoordinateX() : breakWidth - layout.getAdvance();
 
@@ -223,7 +214,6 @@ public class PhotoComponentView {
             // Move y-coordinate in preparation for next layout.
             drawPosY += layout.getDescent() + layout.getLeading();
         }
-        lineMeasurer = null;
     }
 
     public Dimension getSize() {
