@@ -153,7 +153,6 @@ public class PhotoComponentView {
         annotationModel.setEndCoordinateY(endY);
         drawStrokeLine(graphics2D, annotationModel);
         _controller.addAnnotationModel(annotationModel);
-        //System.out.println("Saved element: " + annotationPoint.toString());
     }
 
     public void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationModel annotationModel) {
@@ -225,19 +224,6 @@ public class PhotoComponentView {
             drawPosY += layout.getDescent() + layout.getLeading();
         }
         lineMeasurer = null;
-
-      List<String> annotationText = annotationPoint.getAnnotationText();
-
-        /*  StringBuilder rawText = new StringBuilder();
-        for (String line : annotationText) {
-            rawText.append(line);
-            rawText.append("\n");
-        }
-
-        graphics2D.drawString(annotationPoint.getCurrentLine(),
-                annotationPoint.getCoordinateX(),
-                annotationPoint.getCoordinateY());
-*/
     }
 
     public Dimension getSize() {
