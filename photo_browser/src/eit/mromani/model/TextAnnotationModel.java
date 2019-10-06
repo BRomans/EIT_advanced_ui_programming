@@ -4,14 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
 import java.text.AttributedString;
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class TextAnnotationModel implements AnnotationModel {
 
     private int _coordinateX;
     private int _coordinateY;
-    private ArrayList<String> _annotationText = new ArrayList<>();
     private Color _lineColor;
 
     private final
@@ -52,11 +50,6 @@ public class TextAnnotationModel implements AnnotationModel {
         this._lineColor = color;
     }
 
-
-    public ArrayList<String> getAnnotationText() {
-        return this._annotationText;
-    }
-
     @Override
     public void setCoordinateX(int coordinateX) {
         this._coordinateX = coordinateX;
@@ -81,7 +74,10 @@ public class TextAnnotationModel implements AnnotationModel {
     }
 
     private String removeLastChar(String str) {
-        return str.substring(0, str.length() - 1);
+        if(str.length() > 1) {
+            return str.substring(0, str.length() - 1);
+        } else
+            return "";
     }
 
     private String addCharacter(String str, char character) {
@@ -93,7 +89,6 @@ public class TextAnnotationModel implements AnnotationModel {
         return "TextAnnotationModel{" +
                 "_coordinateX=" + _coordinateX +
                 ", _coordinateY=" + _coordinateY +
-                ", _annotationText='" + _annotationText + '\'' +
                 ", _lineColor=" + _lineColor +
                 '}';
     }
