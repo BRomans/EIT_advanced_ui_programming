@@ -4,6 +4,10 @@ import eit.mromani.controllers.PhotoComponent;
 import eit.mromani.model.*;
 import eit.mromani.model.AnnotationModel;
 import eit.mromani.model.DrawingAnnotationModel;
+import eit.mromani.util.KeyboardTypeListener;
+import eit.mromani.util.MouseClickListener;
+import eit.mromani.util.MouseDragListener;
+import eit.mromani.util.MousePressListener;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -26,23 +30,23 @@ public class PhotoComponentView {
     private static int DEFAULT_PREFERRED_WIDTH = 800;
     private int SCALE = 1;
 
-    private int start_position_x;
-    private int start_position_y;
-    private int end_position_x;
-    private int end_position_y;
-    private int scaledWidth;
-    private int scaledHeight;
-    private int centerX;
-    private int centerY;
+    private int _start_position_x;
+    private int _start_position_y;
+    private int _end_position_x;
+    private int _end_position_y;
+    private int _scaledWidth;
+    private int _scaledHeight;
+    private int _centerX;
+    private int _centerY;
 
     // The LineBreakMeasurer used to line-break the paragraph.
     private LineBreakMeasurer _lineMeasurer;
 
     // index of the first character in the paragraph.
-    private int paragraphStart;
+    private int _paragraphStart;
 
     // index of the first character after the end of the paragraph.
-    private int paragraphEnd;
+    private int _paragraphEnd;
 
     private PhotoComponent _controller;
 
@@ -56,50 +60,18 @@ public class PhotoComponentView {
 
     private void setupListeners() {
 
-        _controller.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                start_position_x = mouseEvent.getX();
-                start_position_y = mouseEvent.getY();
-            }
+        _controller.addMouseListener((MouseClickListener) this::evaluateMouseClick);
 
-            public void mouseClicked(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 1) {
-                    System.out.println("single clicked");
-                    if (_controller.getFlipState()) {
-                        initTextAnnotation(mouseEvent);
-                    }
-                }
-                if (mouseEvent.getClickCount() == 2) {
-                    System.out.println("double clicked");
-                    _controller.flip();
-                }
-            }
-        });
+        _controller.addMouseListener((MousePressListener) this:: saveMouseCoordinates);
 
-        _controller.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent event) {
-                if (_controller.getFlipState()) {
-                    System.out.println("Dragging the mouse");
-                    drawAndSaveLine(start_position_x, start_position_y, event.getX(), event.getY());
-                    start_position_x = event.getX();
-                    start_position_y = event.getY();
-                }
-            }
-        });
+        _controller.addMouseMotionListener((MouseDragListener) this::evaluateMouseDrag );
 
-        _controller.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent event) {
-                if (_controller.getFlipState()) {
-                    Character keyValue = event.getKeyChar();
-                    System.out.println("Key pressed: " + keyValue);
-                    _currentAnnotation.processNewCharacter(keyValue);
-                    _controller.repaint();
-                }
-            }
-        });
+        _controller.addKeyListener((KeyboardTypeListener) this::evaluateKeyTyped);
+    }
+
+    private void saveMouseCoordinates(MouseEvent mouseEvent) {
+        _start_position_x = mouseEvent.getX();
+        _start_position_y = mouseEvent.getY();
     }
 
     private void evaluateMouseClick(MouseEvent mouseEvent) {
@@ -115,22 +87,40 @@ public class PhotoComponentView {
         }
     }
 
+    private void evaluateMouseDrag(MouseEvent mouseEvent) {
+        if (_controller.getFlipState()) {
+            System.out.println("Dragging the mouse");
+            drawAndSaveLine(_start_position_x, _start_position_y, mouseEvent.getX(), mouseEvent.getY());
+            _start_position_x = mouseEvent.getX();
+            _start_position_y = mouseEvent.getY();
+        }
+    }
+
+    private void evaluateKeyTyped(KeyEvent event) {
+        if (_controller.getFlipState()) {
+            Character keyValue = event.getKeyChar();
+            System.out.println("Key pressed: " + keyValue);
+            _currentAnnotation.processNewCharacter(keyValue);
+            _controller.repaint();
+        }
+    }
+
     public void paint(Graphics graphics, PhotoComponent photoComponent) {
         PhotoComponentModel model = photoComponent.getModel();
         adjustScaling();
         Graphics2D graphics2D = (Graphics2D) graphics;
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        scaledWidth = _controller.getImage().getWidth() / SCALE;
-        scaledHeight = _controller.getImage().getHeight() / SCALE;
+        _scaledWidth = _controller.getImage().getWidth() / SCALE;
+        _scaledHeight = _controller.getImage().getHeight() / SCALE;
         Image image = _controller.getImage();
-        image = image.getScaledInstance(scaledWidth, scaledHeight,  Image.SCALE_DEFAULT);
-        centerX = (photoComponent.getX() + photoComponent.getWidth() - scaledWidth) / 2;
-        centerY = (photoComponent.getY() + photoComponent.getHeight() - scaledHeight) / 2;
+        image = image.getScaledInstance(_scaledWidth, _scaledHeight,  Image.SCALE_DEFAULT);
+        _centerX = (photoComponent.getX() + photoComponent.getWidth() - _scaledWidth) / 2;
+        _centerY = (photoComponent.getY() + photoComponent.getHeight() - _scaledHeight) / 2;
         if (!model.isFlipped()) {
-            graphics2D.drawImage(image, centerX, centerY, null);
+            graphics2D.drawImage(image, _centerX, _centerY, null);
         } else {
             graphics2D.setColor(Color.white);
-            graphics2D.fillRect(centerX, centerY, scaledWidth, scaledHeight);
+            graphics2D.fillRect(_centerX, _centerY, _scaledWidth, _scaledHeight);
             List<AnnotationModel> drawingPoints = _controller.getDrawingPoints();
             List<AnnotationModel> textPoints = _controller.getTextPoints();
             for (AnnotationModel annotationModel : textPoints) {
@@ -141,24 +131,24 @@ public class PhotoComponentView {
             }
         }
         graphics2D.setColor(Color.black);
-        graphics2D.drawRect(centerX, centerY, scaledWidth, scaledHeight);
+        graphics2D.drawRect(_centerX, _centerY, _scaledWidth, _scaledHeight);
     }
 
-    public boolean isOnThePicture(int coordinateX, int coordinateY) {
+    private boolean isOnThePicture(int coordinateX, int coordinateY) {
         boolean horizontalValid = false;
         boolean verticalValid = false;
-        if (coordinateX < _controller.getImage().getWidth() / SCALE + centerX
-            && coordinateX > centerX) {
+        if (coordinateX < _controller.getImage().getWidth() / SCALE + _centerX
+            && coordinateX > _centerX) {
             horizontalValid = true;
         }
-        if (coordinateY < _controller.getImage().getHeight() / SCALE + centerY
-            && coordinateY > centerY) {
+        if (coordinateY < _controller.getImage().getHeight() / SCALE + _centerY
+            && coordinateY > _centerY) {
             verticalValid = true;
         }
         return horizontalValid && verticalValid;
     }
 
-    public void drawAndSaveLine(int startX, int startY, int endX, int endY) {
+    private void drawAndSaveLine(int startX, int startY, int endX, int endY) {
         DrawingAnnotationModel annotationModel = new DrawingAnnotationModel();
         Graphics2D graphics2D = (Graphics2D) _controller.getGraphics();
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -185,8 +175,8 @@ public class PhotoComponentView {
     }
 
     private void initTextAnnotation(MouseEvent mouseEvent) {
-        start_position_x = mouseEvent.getX();
-        start_position_y = mouseEvent.getY();
+        _start_position_x = mouseEvent.getX();
+        _start_position_y = mouseEvent.getY();
         _controller.requestFocus();
         TextAnnotationModel annotationModel = new TextAnnotationModel(mouseEvent);
         saveTextAnnotation(annotationModel);
@@ -204,17 +194,17 @@ public class PhotoComponentView {
             graphics2D.setColor(annotationPoint.getLineColor());
 
             AttributedCharacterIterator paragraph = annotationPoint.getCurrentLineIterator().getIterator();
-            paragraphStart = paragraph.getBeginIndex();
-            paragraphEnd = paragraph.getEndIndex();
+            _paragraphStart = paragraph.getBeginIndex();
+            _paragraphEnd = paragraph.getEndIndex();
             FontRenderContext frc = graphics2D.getFontRenderContext();
             _lineMeasurer = new LineBreakMeasurer(paragraph, frc);
 
             // we calculate the X position with the photo width and the click X coordinate
-            float breakWidth = (float) (_controller.getImage().getWidth() / SCALE - annotationPoint.getCoordinateX() + centerX);
+            float breakWidth = (float) (_controller.getImage().getWidth() / SCALE - annotationPoint.getCoordinateX() + _centerX);
             float drawPosY = annotationPoint.getCoordinateY();
-            _lineMeasurer.setPosition(paragraphStart);
+            _lineMeasurer.setPosition(_paragraphStart);
             try {
-                while (_lineMeasurer.getPosition() < paragraphEnd) {
+                while (_lineMeasurer.getPosition() < _paragraphEnd) {
 
                     TextLayout layout = _lineMeasurer.nextLayout(breakWidth);
 
@@ -240,11 +230,14 @@ public class PhotoComponentView {
     }
 
     private void adjustScaling() {
-        if(_controller.getImage().getWidth() > 1500 || _controller.getImage().getHeight() > 1500) {
+        if (_controller.getImage().getWidth() > 1500 || _controller.getImage().getHeight() > 1500) {
             this.SCALE = 2;
-        }
-        if(_controller.getImage().getWidth() > 2500 || _controller.getImage().getHeight() > 2500) {
+        } else if (_controller.getImage().getWidth() > 2500 || _controller.getImage().getHeight() > 2500) {
             this.SCALE = 3;
+        } else if (_controller.getImage().getWidth() > 3500 || _controller.getImage().getHeight() > 3500) {
+            this.SCALE = 4;
+        } else if (_controller.getImage().getWidth() > 4500 || _controller.getImage().getHeight() > 4500) {
+            this.SCALE = 5;
         } else {
             this.SCALE = 1;
         }

@@ -85,13 +85,10 @@ public class PhotoBrowser extends JFrame {
 
         _menuContent = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        //FIXME dimension not working
-
         _photoContainer = new JScrollPane();
         _photoContainer.setBackground(Color.BLUE);
         _photoContainer.getViewport().setBackground(Color.CYAN);
         _photoContainer.setOpaque(true);
-       // _photoContainer.setSize(photoContainerSize);
         _photoContainer.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         _photoContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
@@ -161,40 +158,15 @@ public class PhotoBrowser extends JFrame {
      *
      */
     private void initMenuListeners() {
-        _importOption.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                importImage();
-            }
-        });
+        _importOption.addActionListener(e -> importImage());
 
-        _deleteOption.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                _statusBarContent.displayNotImplemented("DELETE");
-            }
-        });
+        _deleteOption.addActionListener(e -> _statusBarContent.displayNotImplemented("DELETE"));
 
-        _quitOption.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        _quitOption.addActionListener(e -> System.exit(0));
 
-        _photoViewerOption.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                _statusBarContent.displayNotImplemented("PHOTO VIEWER");
-            }
-        });
+        _photoViewerOption.addActionListener(e -> _statusBarContent.displayNotImplemented("PHOTO VIEWER"));
 
-        _browserOption.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                _statusBarContent.displayNotImplemented("BROWSE");
-            }
-        });
+        _browserOption.addActionListener(e -> _statusBarContent.displayNotImplemented("BROWSE"));
     }
 
     private void importImage() {
@@ -204,8 +176,6 @@ public class PhotoBrowser extends JFrame {
             PhotoComponent photoComponent = new PhotoComponent();
             photoComponent.renderImage(filePath);
             _photoContainer.getViewport().add(photoComponent);
-
-
         } else {
             _statusBarContent.showStatusMessage("No file could be loaded");
 
@@ -216,24 +186,11 @@ public class PhotoBrowser extends JFrame {
      * This function init listeners for the toolbar buttons
      */
     private void initToolbarListeners() {
-        _peopleButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                _statusBarContent.displayNotImplemented("TOOLBAR");
-            }
-        });
-        _placesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                _statusBarContent.displayNotImplemented("TOOLBAR");
-            }
-        });
-        _schoolButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                _statusBarContent.displayNotImplemented("TOOLBAR");
-            }
-        });
+        _peopleButton.addActionListener(e -> _statusBarContent.displayNotImplemented("TOOLBAR"));
+
+        _placesButton.addActionListener(e -> _statusBarContent.displayNotImplemented("TOOLBAR"));
+
+        _schoolButton.addActionListener(e -> _statusBarContent.displayNotImplemented("TOOLBAR"));
     }
 
     /**
