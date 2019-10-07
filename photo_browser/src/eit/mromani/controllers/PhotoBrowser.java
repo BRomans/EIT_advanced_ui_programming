@@ -94,7 +94,7 @@ public class PhotoBrowser extends JFrame {
         _bottomStatusBar = new StatusBar();
 
         _toolbarButtons = new JToolBar(SwingConstants.VERTICAL);
-        _drawingToolbar = new StyleToolbar(SwingConstants.VERTICAL);
+        _drawingToolbar = new StyleToolbar(SwingConstants.HORIZONTAL);
 
     }
 
@@ -203,11 +203,13 @@ public class PhotoBrowser extends JFrame {
      * This function builds the window elements with the proper hierarchy
      */
     private void buildWindow() {
-        this.getContentPane().add(_menuContent, BorderLayout.NORTH);
+        JPanel topPanel = new JPanel(new GridLayout());
+        topPanel.add(_menuContent);
+        topPanel.add(_drawingToolbar);
+        this.getContentPane().add(topPanel, BorderLayout.NORTH);
         this.getContentPane().add(_photoContainer, BorderLayout.CENTER);
         this.getContentPane().add(_bottomStatusBar, BorderLayout.SOUTH);
         this.getContentPane().add(_toolbarButtons, BorderLayout.WEST);
-        this.getContentPane().add(_drawingToolbar, BorderLayout.EAST);
         this.pack();
     }
 }
