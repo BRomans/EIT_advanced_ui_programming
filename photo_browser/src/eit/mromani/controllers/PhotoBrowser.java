@@ -37,7 +37,7 @@ public class PhotoBrowser extends JFrame {
 
     // toolbar components
     private JToolBar _toolbarButtons;
-    private JToolBar _drawingToolbar;
+    private StyleToolbar _drawingToolbar;
     private JButton _peopleButton;
     private JButton _placesButton;
     private JButton _schoolButton;
@@ -94,7 +94,7 @@ public class PhotoBrowser extends JFrame {
         _bottomStatusBar = new StatusBar();
 
         _toolbarButtons = new JToolBar(SwingConstants.VERTICAL);
-        _drawingToolbar = new JToolBar(SwingConstants.VERTICAL);
+        _drawingToolbar = new StyleToolbar(SwingConstants.VERTICAL);
 
     }
 
