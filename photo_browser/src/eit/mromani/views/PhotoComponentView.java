@@ -164,6 +164,7 @@ public class PhotoComponentView {
         }
 
         // draw the border
+        graphics2D.setStroke(new BasicStroke(1));
         graphics2D.setColor(Color.black);
         graphics2D.drawRect(_centerX, _centerY, _scaledWidth, _scaledHeight);
     }
@@ -183,6 +184,9 @@ public class PhotoComponentView {
         annotationModel.setCoordinateY(startY);
         annotationModel.setEndCoordinateX(endX);
         annotationModel.setEndCoordinateY(endY);
+        annotationModel.setLineColor(_controller.getStyleToolbar().getSelectedColor());
+        annotationModel.setLineSize(_controller.getStyleToolbar().getStrokeSize());
+        annotationModel.setShape(_controller.getStyleToolbar().getSelectedShape());
         drawStrokeLine(graphics2D, annotationModel);
         _controller.addAnnotationModel(annotationModel);
         _controller.sendMessageToStatusBar("Drawing annotation successfully created!");
@@ -203,10 +207,20 @@ public class PhotoComponentView {
 
         if (startPointValid && endPointValid) {
             graphics2D.setColor(annotationModel.getLineColor());
-            graphics2D.drawLine(annotationModel.getCoordinateX(),
-                    annotationModel.getCoordinateY(),
-                    annotationModel.getEndCoordinateX(),
-                    annotationModel.getEndCoordinateY());
+            graphics2D.setStroke(new BasicStroke(annotationModel.getLineSize()));
+            if(annotationModel.getShape().equals("stroke")) {
+                graphics2D.drawLine(annotationModel.getCoordinateX(),
+                        annotationModel.getCoordinateY(),
+                        annotationModel.getEndCoordinateX(),
+                        annotationModel.getEndCoordinateY());
+            }
+            if(annotationModel.getShape().equals("square")) {
+               //TODO implement square drawing
+            }
+            if(annotationModel.getShape().equals("circle")) {
+               //TODO implement circle drawing
+            }
+
         }
     }
 
@@ -219,6 +233,9 @@ public class PhotoComponentView {
         _start_position_y = mouseEvent.getY();
         _controller.requestFocus();
         TextAnnotationModel annotationModel = new TextAnnotationModel(mouseEvent);
+        annotationModel.setFontFamily(_controller.getStyleToolbar().getSelectedFont());
+        annotationModel.setFontSize(_controller.getStyleToolbar().getFontSize());
+        annotationModel.setLineColor(_controller.getStyleToolbar().getSelectedColor());
         saveTextAnnotation(annotationModel);
         _currentAnnotation = annotationModel;
     }

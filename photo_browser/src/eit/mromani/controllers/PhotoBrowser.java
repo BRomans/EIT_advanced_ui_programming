@@ -173,7 +173,7 @@ public class PhotoBrowser extends JFrame {
         String filePath = _mainMenuBar.loadPicture();
         if (filePath != null && !filePath.equals("")) {
             _bottomStatusBar.showStatusMessage("Successfully loaded file: " + filePath);
-            PhotoComponent photoComponent = new PhotoComponent(_bottomStatusBar);
+            PhotoComponent photoComponent = new PhotoComponent(_bottomStatusBar, _drawingToolbar);
             photoComponent.renderImage(filePath);
             _photoContainer.getViewport().add(photoComponent);
         } else {

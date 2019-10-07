@@ -16,6 +16,8 @@ public class DrawingAnnotationModel implements AnnotationModel {
     private int _endCoordinateX;
     private int _endCoordinateY;
     private Color _lineColor;
+    private int _lineSize;
+    private String _shape;
 
     /*Getters and setters*/
 
@@ -69,6 +71,21 @@ public class DrawingAnnotationModel implements AnnotationModel {
         this._coordinateY = coordinateY;
     }
 
+    public int getLineSize() {
+        return _lineSize;
+    }
+
+    public void setLineSize(int _lineSize) {
+        this._lineSize = _lineSize;
+    }
+
+    public String getShape() {
+        return _shape;
+    }
+
+    public void setShape(String _shape) {
+        this._shape = _shape;
+    }
 
     @Override
     public String toString() {

@@ -24,6 +24,7 @@ public class TextAnnotationModel implements AnnotationModel {
     private final Hashtable<TextAttribute, Object> map = new Hashtable<TextAttribute, Object>();
 
     //init the current line with an empty character that allows the AttributedString creation
+    //FIXME this character is nor correctly rendered on some fonts
     private String _currentLine = "\0";
     private AttributedString _currentLineIterator = new AttributedString(
             _currentLine,

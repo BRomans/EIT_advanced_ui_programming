@@ -25,13 +25,15 @@ public class PhotoComponent extends JComponent {
     private PhotoComponentView _view;
     private BufferedImage _image;
     private StatusBar _statusBar;
+    private StyleToolbar _styleToolbar;
 
-    public PhotoComponent(StatusBar statusBar) {
+    public PhotoComponent(StatusBar statusBar, StyleToolbar styleToolbar) {
         setModel(new PhotoComponentModel());
         setView(new PhotoComponentView(this));
         this.setSize(_view.getSize());
         this.setPreferredSize(_view.getPreferredSize());
         this._statusBar = statusBar;
+        this._styleToolbar = styleToolbar;
     }
 
     /**
@@ -105,15 +107,6 @@ public class PhotoComponent extends JComponent {
         return _model.getTextPoints();
     }
 
-    public int getPhotoComponentX() {
-        return this.getX();
-    }
-
-    public int getPhotoComponentY() {
-        return this.getY();
-    }
-
-
     private void setView(PhotoComponentView view) {
         this._view = view;
     }
@@ -133,6 +126,10 @@ public class PhotoComponent extends JComponent {
     @Override
     public Dimension getPreferredSize() {
         return _view.getPreferredSize();
+    }
+
+    public StyleToolbar getStyleToolbar() {
+        return _styleToolbar;
     }
 
     /**
