@@ -4,10 +4,7 @@ import eit.mromani.controllers.PhotoComponent;
 import eit.mromani.model.*;
 import eit.mromani.model.AnnotationModel;
 import eit.mromani.model.DrawingAnnotationModel;
-import eit.mromani.util.KeyboardTypeListener;
-import eit.mromani.util.MouseClickListener;
-import eit.mromani.util.MouseDragListener;
-import eit.mromani.util.MousePressListener;
+import eit.mromani.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -20,20 +17,22 @@ import java.util.List;
 /**
  * @author BRomans
  * <p>
- * This is the view for PhotoComponent
+ * This is the view for PhotoComponent. Event listeners and drawing methods are implemented in this class.
  */
 public class PhotoComponentView {
 
+    // component default values
     private static int DEFAULT_HEIGHT = 600;
     private static int DEFAULT_WIDTH = 600;
     private static int DEFAULT_PREFERRED_HEIGHT = 800;
     private static int DEFAULT_PREFERRED_WIDTH = 800;
     private int SCALE = 1;
 
+    // last mouse event coordinates
     private int _start_position_x;
     private int _start_position_y;
-    private int _end_position_x;
-    private int _end_position_y;
+
+    // image size and coordinates
     private int _scaledWidth;
     private int _scaledHeight;
     private int _centerX;
@@ -48,8 +47,10 @@ public class PhotoComponentView {
     // index of the first character after the end of the paragraph.
     private int _paragraphEnd;
 
+    // controller of the component
     private PhotoComponent _controller;
 
+    // current editable annotation
     private TextAnnotationModel _currentAnnotation;
 
     public PhotoComponentView(PhotoComponent controller) {
@@ -62,9 +63,9 @@ public class PhotoComponentView {
 
         _controller.addMouseListener((MouseClickListener) this::evaluateMouseClick);
 
-        _controller.addMouseListener((MousePressListener) this:: saveMouseCoordinates);
+        _controller.addMouseListener((MousePressListener) this::saveMouseCoordinates);
 
-        _controller.addMouseMotionListener((MouseDragListener) this::evaluateMouseDrag );
+        _controller.addMouseMotionListener((MouseDragListener) this::evaluateMouseDrag);
 
         _controller.addKeyListener((KeyboardTypeListener) this::evaluateKeyTyped);
     }
@@ -107,13 +108,13 @@ public class PhotoComponentView {
 
     public void paint(Graphics graphics, PhotoComponent photoComponent) {
         PhotoComponentModel model = photoComponent.getModel();
-        adjustScaling();
+        this.SCALE = HelperMethods.adjustScaling(_controller.getImage().getWidth(), _controller.getImage().getHeight());
         Graphics2D graphics2D = (Graphics2D) graphics;
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         _scaledWidth = _controller.getImage().getWidth() / SCALE;
         _scaledHeight = _controller.getImage().getHeight() / SCALE;
         Image image = _controller.getImage();
-        image = image.getScaledInstance(_scaledWidth, _scaledHeight,  Image.SCALE_DEFAULT);
+        image = image.getScaledInstance(_scaledWidth, _scaledHeight, Image.SCALE_DEFAULT);
         _centerX = (photoComponent.getX() + photoComponent.getWidth() - _scaledWidth) / 2;
         _centerY = (photoComponent.getY() + photoComponent.getHeight() - _scaledHeight) / 2;
         if (!model.isFlipped()) {
@@ -134,20 +135,6 @@ public class PhotoComponentView {
         graphics2D.drawRect(_centerX, _centerY, _scaledWidth, _scaledHeight);
     }
 
-    private boolean isOnThePicture(int coordinateX, int coordinateY) {
-        boolean horizontalValid = false;
-        boolean verticalValid = false;
-        if (coordinateX < _controller.getImage().getWidth() / SCALE + _centerX
-            && coordinateX > _centerX) {
-            horizontalValid = true;
-        }
-        if (coordinateY < _controller.getImage().getHeight() / SCALE + _centerY
-            && coordinateY > _centerY) {
-            verticalValid = true;
-        }
-        return horizontalValid && verticalValid;
-    }
-
     private void drawAndSaveLine(int startX, int startY, int endX, int endY) {
         DrawingAnnotationModel annotationModel = new DrawingAnnotationModel();
         Graphics2D graphics2D = (Graphics2D) _controller.getGraphics();
@@ -160,11 +147,13 @@ public class PhotoComponentView {
         _controller.addAnnotationModel(annotationModel);
     }
 
-    public void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationModel annotationModel) {
-        boolean startPointValid = isOnThePicture(annotationModel.getCoordinateX(),
-                annotationModel.getCoordinateY());
-        boolean endPointValid = isOnThePicture(annotationModel.getEndCoordinateX(),
-                annotationModel.getEndCoordinateY());
+    private void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationModel annotationModel) {
+        boolean startPointValid = HelperMethods.isOnThePicture(annotationModel.getCoordinateX(), annotationModel.getCoordinateY(),
+                _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
+
+        boolean endPointValid = HelperMethods.isOnThePicture(annotationModel.getEndCoordinateX(), annotationModel.getEndCoordinateY(),
+                _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
+
         if (startPointValid && endPointValid) {
             graphics2D.setColor(annotationModel.getLineColor());
             graphics2D.drawLine(annotationModel.getCoordinateX(),
@@ -188,8 +177,9 @@ public class PhotoComponentView {
     }
 
     private void drawTextAnnotation(Graphics2D graphics2D, TextAnnotationModel annotationPoint) {
-        boolean startPointValid = isOnThePicture(annotationPoint.getCoordinateX(),
-                annotationPoint.getCoordinateY());
+        boolean startPointValid = HelperMethods.isOnThePicture(annotationPoint.getCoordinateX(), annotationPoint.getCoordinateY(),
+                _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
+
         if (startPointValid) {
             graphics2D.setColor(annotationPoint.getLineColor());
 
@@ -222,24 +212,10 @@ public class PhotoComponentView {
                     // Move y-coordinate in preparation for next layout.
                     drawPosY += layout.getDescent() + layout.getLeading();
                 }
-            }catch (Exception exception) {
+            } catch (Exception exception) {
                 System.out.println("There was a problem while rendering the annotation text");
                 exception.printStackTrace();
             }
-        }
-    }
-
-    private void adjustScaling() {
-        if (_controller.getImage().getWidth() > 1500 || _controller.getImage().getHeight() > 1500) {
-            this.SCALE = 2;
-        } else if (_controller.getImage().getWidth() > 2500 || _controller.getImage().getHeight() > 2500) {
-            this.SCALE = 3;
-        } else if (_controller.getImage().getWidth() > 3500 || _controller.getImage().getHeight() > 3500) {
-            this.SCALE = 4;
-        } else if (_controller.getImage().getWidth() > 4500 || _controller.getImage().getHeight() > 4500) {
-            this.SCALE = 5;
-        } else {
-            this.SCALE = 1;
         }
     }
 
