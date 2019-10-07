@@ -2,13 +2,22 @@ package eit.mromani.model;
 
 import java.awt.*;
 
+/**
+ *
+ * @author BRomans
+ *
+ * This is the model for free-hand Drawing annotations
+ */
 public class DrawingAnnotationModel implements AnnotationModel {
 
+    // annotation fields
     private int _coordinateX;
     private int _coordinateY;
     private int _endCoordinateX;
     private int _endCoordinateY;
     private Color _lineColor;
+
+    /*Getters and setters*/
 
     public int getEndCoordinateX() {
         return _endCoordinateX;

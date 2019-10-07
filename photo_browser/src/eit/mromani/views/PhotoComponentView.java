@@ -59,6 +59,9 @@ public class PhotoComponentView {
 
     }
 
+    /**
+     * Setups listeners with functional interfaces
+     */
     private void setupListeners() {
 
         _controller.addMouseListener((MousePressListener) this::saveMouseCoordinates);
@@ -70,11 +73,19 @@ public class PhotoComponentView {
         _controller.addKeyListener((KeyboardTypeListener) this::evaluateKeyTyped);
     }
 
+    /**
+     * Saves last mouse event coordinates
+     * @param mouseEvent
+     */
     private void saveMouseCoordinates(MouseEvent mouseEvent) {
         _start_position_x = mouseEvent.getX();
         _start_position_y = mouseEvent.getY();
     }
 
+    /**
+     * Evaluates the number of click events and then processes them
+     * @param mouseEvent
+     */
     private void evaluateMouseClick(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 1) {
             System.out.println("single clicked");
@@ -88,6 +99,10 @@ public class PhotoComponentView {
         }
     }
 
+    /**
+     * If the image is in annotation mode, starts processing drawing annotations
+     * @param mouseEvent
+     */
     private void evaluateMouseDrag(MouseEvent mouseEvent) {
         if (_controller.getFlipState()) {
             System.out.println("Dragging the mouse");
@@ -97,6 +112,10 @@ public class PhotoComponentView {
         }
     }
 
+    /**
+     * Processes text input and adds it to the last annotation point in focus
+     * @param event
+     */
     private void evaluateKeyTyped(KeyEvent event) {
         if (_controller.getFlipState()) {
             Character keyValue = event.getKeyChar();
@@ -106,20 +125,32 @@ public class PhotoComponentView {
         }
     }
 
+    /**
+     * This method processes the drawing of the component and the annotations saved in memory
+     * @param graphics
+     * @param photoComponent
+     */
     public void paint(Graphics graphics, PhotoComponent photoComponent) {
         PhotoComponentModel model = photoComponent.getModel();
-        this.SCALE = HelperMethods.adjustScaling(_controller.getImage().getWidth(), _controller.getImage().getHeight());
         Graphics2D graphics2D = (Graphics2D) graphics;
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        _scaledWidth = _controller.getImage().getWidth() / SCALE;
-        _scaledHeight = _controller.getImage().getHeight() / SCALE;
-        Image image = _controller.getImage();
-        image = image.getScaledInstance(_scaledWidth, _scaledHeight, Image.SCALE_DEFAULT);
-        _centerX = (photoComponent.getX() + photoComponent.getWidth() - _scaledWidth) / 2;
-        _centerY = (photoComponent.getY() + photoComponent.getHeight() - _scaledHeight) / 2;
+
+        // Apply scaling and centering to the component
+        this.SCALE = HelperMethods.adjustScaling(_controller.getImage().getWidth(), _controller.getImage().getHeight());
+        this._scaledWidth = _controller.getImage().getWidth() / SCALE;
+        this._scaledHeight = _controller.getImage().getHeight() / SCALE;
+        this._centerX = (photoComponent.getX() + photoComponent.getWidth() - this._scaledWidth) / 2;
+        this._centerY = (photoComponent.getY() + photoComponent.getHeight() - this._scaledHeight) / 2;
+
         if (!model.isFlipped()) {
+
+            // draw the image
+            Image image = _controller.getImage();
+            image = image.getScaledInstance(_scaledWidth, _scaledHeight, Image.SCALE_DEFAULT);
             graphics2D.drawImage(image, _centerX, _centerY, null);
         } else {
+
+            // draw the canvas and the annotations
             graphics2D.setColor(Color.white);
             graphics2D.fillRect(_centerX, _centerY, _scaledWidth, _scaledHeight);
             List<AnnotationModel> drawingPoints = _controller.getDrawingPoints();
@@ -131,10 +162,19 @@ public class PhotoComponentView {
                 drawStrokeLine(graphics2D, (DrawingAnnotationModel) annotationModel);
             }
         }
+
+        // draw the border
         graphics2D.setColor(Color.black);
         graphics2D.drawRect(_centerX, _centerY, _scaledWidth, _scaledHeight);
     }
 
+    /**
+     * Draws a single line between the starting point coordinates and the ending point coordinates
+     * @param startX starting point X coordinate
+     * @param startY starting point Y coordinate
+     * @param endX ending point X coordinate
+     * @param endY ending point Y coordinate
+     */
     private void drawAndSaveLine(int startX, int startY, int endX, int endY) {
         DrawingAnnotationModel annotationModel = new DrawingAnnotationModel();
         Graphics2D graphics2D = (Graphics2D) _controller.getGraphics();
@@ -145,8 +185,15 @@ public class PhotoComponentView {
         annotationModel.setEndCoordinateY(endY);
         drawStrokeLine(graphics2D, annotationModel);
         _controller.addAnnotationModel(annotationModel);
+        _controller.sendMessageToStatusBar("Drawing annotation successfully created!");
     }
 
+    /**
+     * Support function that actually performs the drawing if the starting point and ending points are
+     * within valid boundaries
+     * @param graphics2D
+     * @param annotationModel the drawing annotation
+     */
     private void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationModel annotationModel) {
         boolean startPointValid = HelperMethods.isOnThePicture(annotationModel.getCoordinateX(), annotationModel.getCoordinateY(),
                 _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
@@ -163,6 +210,10 @@ public class PhotoComponentView {
         }
     }
 
+    /**
+     * Init the text annotation model and request the focus for the text-box
+     * @param mouseEvent
+     */
     private void initTextAnnotation(MouseEvent mouseEvent) {
         _start_position_x = mouseEvent.getX();
         _start_position_y = mouseEvent.getY();
@@ -174,8 +225,16 @@ public class PhotoComponentView {
 
     private void saveTextAnnotation(TextAnnotationModel annotationModel) {
         _controller.addAnnotationModel(annotationModel);
+        _controller.sendMessageToStatusBar("Text annotation successfully created!");
     }
 
+    /**
+     * Processes the text annotation and calculates boundaries for proper formatting.
+     * Custom implementation of the javadoc sample that can be found here:
+     * https://docs.oracle.com/javase/tutorial/2d/text/drawmulstring.html
+     * @param graphics2D the graphics
+     * @param annotationPoint the text annotation
+     */
     private void drawTextAnnotation(Graphics2D graphics2D, TextAnnotationModel annotationPoint) {
         boolean startPointValid = HelperMethods.isOnThePicture(annotationPoint.getCoordinateX(), annotationPoint.getCoordinateY(),
                 _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
@@ -214,6 +273,7 @@ public class PhotoComponentView {
                 }
             } catch (Exception exception) {
                 System.out.println("There was a problem while rendering the annotation text");
+                _controller.sendMessageToStatusBar("There was a problem while rendering the annotation text, check log for more info.");
                 exception.printStackTrace();
             }
         }

@@ -2,8 +2,6 @@ package eit.mromani.controllers;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  *
@@ -23,7 +21,7 @@ public class PhotoBrowser extends JFrame {
     // main components
     private JPanel _menuContent;
     private JScrollPane _photoContainer;
-    private StatusBar _statusBarContent;
+    private StatusBar _bottomStatusBar;
     private MenuBar _mainMenuBar;
 
     // file menu components
@@ -93,7 +91,7 @@ public class PhotoBrowser extends JFrame {
         _photoContainer.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         _photoContainer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        _statusBarContent = new StatusBar();
+        _bottomStatusBar = new StatusBar();
 
         _toolbarButtons = new JToolBar(SwingConstants.VERTICAL);
         _drawingToolbar = new JToolBar(SwingConstants.VERTICAL);
@@ -166,26 +164,26 @@ public class PhotoBrowser extends JFrame {
 
         _quitOption.addActionListener(e -> System.exit(0));
 
-        _photoViewerOption.addActionListener(e -> _statusBarContent.displayNotImplemented("PHOTO VIEWER"));
+        _photoViewerOption.addActionListener(e -> _bottomStatusBar.displayNotImplemented("PHOTO VIEWER"));
 
-        _browserOption.addActionListener(e -> _statusBarContent.displayNotImplemented("BROWSE"));
+        _browserOption.addActionListener(e -> _bottomStatusBar.displayNotImplemented("BROWSE"));
     }
 
     private void importImage() {
         String filePath = _mainMenuBar.loadPicture();
         if (filePath != null && !filePath.equals("")) {
-            _statusBarContent.showStatusMessage("Successfully loaded file: " + filePath);
-            PhotoComponent photoComponent = new PhotoComponent();
+            _bottomStatusBar.showStatusMessage("Successfully loaded file: " + filePath);
+            PhotoComponent photoComponent = new PhotoComponent(_bottomStatusBar);
             photoComponent.renderImage(filePath);
             _photoContainer.getViewport().add(photoComponent);
         } else {
-            _statusBarContent.showStatusMessage("No file could be loaded");
+            _bottomStatusBar.showStatusMessage("No file could be loaded");
 
         }
     }
 
     private void removeImage() {
-        _statusBarContent.showStatusMessage("Removing current image...");
+        _bottomStatusBar.showStatusMessage("Removing current image...");
         _photoContainer.getViewport().removeAll();
         super.repaint();
     }
@@ -194,11 +192,11 @@ public class PhotoBrowser extends JFrame {
      * This function init listeners for the toolbar buttons
      */
     private void initToolbarListeners() {
-        _peopleButton.addActionListener(e -> _statusBarContent.displayNotImplemented("TOOLBAR"));
+        _peopleButton.addActionListener(e -> _bottomStatusBar.displayNotImplemented("TOOLBAR"));
 
-        _placesButton.addActionListener(e -> _statusBarContent.displayNotImplemented("TOOLBAR"));
+        _placesButton.addActionListener(e -> _bottomStatusBar.displayNotImplemented("TOOLBAR"));
 
-        _schoolButton.addActionListener(e -> _statusBarContent.displayNotImplemented("TOOLBAR"));
+        _schoolButton.addActionListener(e -> _bottomStatusBar.displayNotImplemented("TOOLBAR"));
     }
 
     /**
@@ -207,7 +205,7 @@ public class PhotoBrowser extends JFrame {
     private void buildWindow() {
         this.getContentPane().add(_menuContent, BorderLayout.NORTH);
         this.getContentPane().add(_photoContainer, BorderLayout.CENTER);
-        this.getContentPane().add(_statusBarContent, BorderLayout.SOUTH);
+        this.getContentPane().add(_bottomStatusBar, BorderLayout.SOUTH);
         this.getContentPane().add(_toolbarButtons, BorderLayout.WEST);
         this.getContentPane().add(_drawingToolbar, BorderLayout.EAST);
         this.pack();

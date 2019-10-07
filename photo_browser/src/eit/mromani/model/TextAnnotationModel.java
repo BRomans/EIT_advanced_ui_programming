@@ -8,6 +8,12 @@ import java.awt.font.TextAttribute;
 import java.text.AttributedString;
 import java.util.Hashtable;
 
+/**
+ *
+ * @author BRomans
+ *
+ * This is the model for Text annotations
+ */
 public class TextAnnotationModel implements AnnotationModel {
 
     // annotation fields

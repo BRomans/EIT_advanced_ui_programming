@@ -24,51 +24,77 @@ public class PhotoComponent extends JComponent {
     private PhotoComponentModel _model;
     private PhotoComponentView _view;
     private BufferedImage _image;
+    private StatusBar _statusBar;
 
-    public PhotoComponent() {
+    public PhotoComponent(StatusBar statusBar) {
         setModel(new PhotoComponentModel());
         setView(new PhotoComponentView(this));
         this.setSize(_view.getSize());
         this.setPreferredSize(_view.getPreferredSize());
+        this._statusBar = statusBar;
     }
 
-    public void renderImage(String path) {
+    /**
+     * Loads an image into the application
+     * @param path The path to the image on the filesystem
+     */
+    void renderImage(String path) {
         try {
             _image = ImageIO.read(new File(path));
         } catch (Exception exception) {
             System.out.println("There was an error loading your image");
+            _statusBar.showStatusMessage("There was an error loading your image");
             exception.printStackTrace();
         }
     }
 
+    /**
+     * Flips the image from annotation mode to image mode and viceversa.
+     */
     public void flip() {
         if(!_model.isFlipped()) {
             flipToAnnotation();
+            _statusBar.showStatusMessage("Annotation Mode: ON");
         } else {
             flipToPhoto();
+            _statusBar.showStatusMessage("Annotation Mode: OFF");
         }
     }
 
-    public void flipToAnnotation() {
+    private void flipToAnnotation() {
         _model.flipPhoto(true);
     }
 
-    public void flipToPhoto() {
+    private void flipToPhoto() {
         _model.flipPhoto(false);
     }
 
-    private void setModel(PhotoComponentModel model) {
-        this._model = model;
-        model.addActionListener(event -> repaint());
-        model.addChangeListener(event -> repaint());
-    }
-
+    /**
+     * Saves a new annotation in memory
+     * @param annotationModel the annotation
+     */
     public void addAnnotationModel(AnnotationModel annotationModel) {
         if(annotationModel instanceof DrawingAnnotationModel) {
             _model.addDrawingPoint(annotationModel);
         } else if (annotationModel instanceof TextAnnotationModel) {
             _model.addTextPoint(annotationModel);
         }
+    }
+
+    /**
+     * Cover method to be called by inner components for displaying messages in the status bar
+     * @param message The message to be displayed
+     */
+    public void sendMessageToStatusBar(String message) {
+        _statusBar.showStatusMessage(message);
+    }
+
+    /* Getters and setters*/
+
+    private void setModel(PhotoComponentModel model) {
+        this._model = model;
+        model.addActionListener(event -> repaint());
+        model.addChangeListener(event -> repaint());
     }
 
     public List<AnnotationModel> getDrawingPoints() {
@@ -109,6 +135,10 @@ public class PhotoComponent extends JComponent {
         return _view.getPreferredSize();
     }
 
+    /**
+     * Functions that trigger the painting of the component
+     * @param g
+     */
     @Override
     public void paintComponent(Graphics g) {
         System.out.println("Repaint triggered!");

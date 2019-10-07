@@ -2,7 +2,12 @@ package eit.mromani.model;
 
 import java.awt.*;
 
-
+/**
+ *
+ * @author BRomans
+ *
+ * This is the model for generic annotation
+ */
 public interface AnnotationModel {
 
 
