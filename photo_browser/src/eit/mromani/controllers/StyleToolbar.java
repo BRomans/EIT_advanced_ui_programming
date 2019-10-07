@@ -20,9 +20,11 @@ public class StyleToolbar extends JToolBar {
     private String _selectedFont;
     private int _fontSize;
     private int _strokeSize;
+    private int _imageScale;
 
     private JButton _colorButton;
     private JComboBox _fontList;
+    private JComboBox _scaleList;
     private JComboBox _fontSizeList;
     private JComboBox _strokeSizeList;
     private JComboBox _shapeChooser;
@@ -42,6 +44,7 @@ public class StyleToolbar extends JToolBar {
         setupFontList();
         setupSizeLists();
         setupShapeChooser();
+        setupScalingOptions();
         setupListeners();
     }
 
@@ -54,7 +57,7 @@ public class StyleToolbar extends JToolBar {
         this._fontSizeList.addActionListener((ActionListener) this::changeFontSize);
         this._strokeSizeList.addActionListener((ActionListener) this::changeStrokeSize);
         this._shapeChooser.addActionListener((ActionListener)this::changeShape);
-
+        this._scaleList.addActionListener((ActionListener)this::changeScale);
     }
 
     /**
@@ -108,6 +111,19 @@ public class StyleToolbar extends JToolBar {
     }
 
     /**
+     * Setups scaling options
+     */
+    private void setupScalingOptions() {
+        String[] scales = {"0","1", "2", "3", "4"};
+        _scaleList = new JComboBox(scales);
+        JLabel scaleLabel = new JLabel("Scale");
+        _imageScale = 0;
+        //TODO implement proper user scaling
+        //_toolsPanel.add(scaleLabel);
+        //_toolsPanel.add(_scaleList);
+    }
+
+    /**
      * Setups a shape chooser. Currently NOT IMPLEMENTED
      */
     private void setupShapeChooser() {
@@ -146,7 +162,15 @@ public class StyleToolbar extends JToolBar {
         this._selectedShape = (String) _shapeChooser.getSelectedItem();
     }
 
+    private void changeScale(ActionEvent event) {
+        this._imageScale = Integer.valueOf((String) _scaleList.getSelectedItem());
+    }
+
     /* Getters */
+
+    public int getImageScale() {
+        return _imageScale;
+    }
 
     public Color getSelectedColor() {
         return _selectedColor;
