@@ -1,5 +1,7 @@
 package eit.mromani.model;
 
+import eit.mromani.util.HelperMethods;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
@@ -8,13 +10,12 @@ import java.util.Hashtable;
 
 public class TextAnnotationModel implements AnnotationModel {
 
+    // annotation fields
     private int _coordinateX;
     private int _coordinateY;
     private Color _lineColor;
 
-    private final
-    Hashtable<TextAttribute, Object> map =
-            new Hashtable<TextAttribute, Object>();
+    private final Hashtable<TextAttribute, Object> map = new Hashtable<TextAttribute, Object>();
 
     //init the current line with an empty character that allows the AttributedString creation
     private String _currentLine = "\0";
@@ -30,6 +31,8 @@ public class TextAnnotationModel implements AnnotationModel {
         map.put(TextAttribute.SIZE, new Float(18.0));
     }
 
+    /*Getters and setters*/
+
     @Override
     public int getCoordinateX() {
         return this._coordinateX;
@@ -43,6 +46,10 @@ public class TextAnnotationModel implements AnnotationModel {
     @Override
     public Color getLineColor() {
         return this._lineColor;
+    }
+
+    public AttributedString getCurrentLineIterator() {
+        return this._currentLineIterator;
     }
 
     @Override
@@ -60,28 +67,25 @@ public class TextAnnotationModel implements AnnotationModel {
         this._coordinateY = coordinateY;
     }
 
-    public AttributedString getCurrentLineIterator() {
-        return this._currentLineIterator;
+    public void setFontFamily(String fontFamily) {
+        map.put(TextAttribute.FAMILY, fontFamily);
     }
 
+    public void setFontSize(float fontSize) {
+        map.put(TextAttribute.BACKGROUND.SIZE, fontSize);
+    }
+
+    /**
+     * This function evaluates the last character and updates the annotation text
+     * @param character the last character typed
+     */
     public void processNewCharacter(Character character) {
         if(character == '\b'){
-            _currentLine = removeLastChar(_currentLine);
+            _currentLine = HelperMethods.removeLastChar(_currentLine);
         } else {
-            _currentLine = addCharacter(_currentLine, character);
+            _currentLine = HelperMethods.addCharacter(_currentLine, character);
         }
         _currentLineIterator = new AttributedString(_currentLine, map);
-    }
-
-    private String removeLastChar(String str) {
-        if(str.length() > 1) {
-            return str.substring(0, str.length() - 1);
-        } else
-            return "";
-    }
-
-    private String addCharacter(String str, char character) {
-        return str + String.valueOf(character);
     }
 
     @Override
@@ -90,7 +94,7 @@ public class TextAnnotationModel implements AnnotationModel {
                 "_coordinateX=" + _coordinateX +
                 ", _coordinateY=" + _coordinateY +
                 ", _lineColor=" + _lineColor +
+                ", _currentLineIterator=" + _currentLineIterator +
                 '}';
     }
-
 }

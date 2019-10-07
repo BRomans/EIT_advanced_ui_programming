@@ -39,6 +39,7 @@ public class PhotoBrowser extends JFrame {
 
     // toolbar components
     private JToolBar _toolbarButtons;
+    private JToolBar _drawingToolbar;
     private JButton _peopleButton;
     private JButton _placesButton;
     private JButton _schoolButton;
@@ -95,6 +96,7 @@ public class PhotoBrowser extends JFrame {
         _statusBarContent = new StatusBar();
 
         _toolbarButtons = new JToolBar(SwingConstants.VERTICAL);
+        _drawingToolbar = new JToolBar(SwingConstants.VERTICAL);
 
     }
 
@@ -160,7 +162,7 @@ public class PhotoBrowser extends JFrame {
     private void initMenuListeners() {
         _importOption.addActionListener(e -> importImage());
 
-        _deleteOption.addActionListener(e -> _statusBarContent.displayNotImplemented("DELETE"));
+        _deleteOption.addActionListener(e -> removeImage());
 
         _quitOption.addActionListener(e -> System.exit(0));
 
@@ -182,6 +184,12 @@ public class PhotoBrowser extends JFrame {
         }
     }
 
+    private void removeImage() {
+        _statusBarContent.showStatusMessage("Removing current image...");
+        _photoContainer.getViewport().removeAll();
+        super.repaint();
+    }
+
     /**
      * This function init listeners for the toolbar buttons
      */
@@ -201,6 +209,7 @@ public class PhotoBrowser extends JFrame {
         this.getContentPane().add(_photoContainer, BorderLayout.CENTER);
         this.getContentPane().add(_statusBarContent, BorderLayout.SOUTH);
         this.getContentPane().add(_toolbarButtons, BorderLayout.WEST);
+        this.getContentPane().add(_drawingToolbar, BorderLayout.EAST);
         this.pack();
     }
 }

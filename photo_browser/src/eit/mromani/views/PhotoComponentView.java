@@ -61,9 +61,9 @@ public class PhotoComponentView {
 
     private void setupListeners() {
 
-        _controller.addMouseListener((MouseClickListener) this::evaluateMouseClick);
-
         _controller.addMouseListener((MousePressListener) this::saveMouseCoordinates);
+
+        _controller.addMouseListener((MouseClickListener) this::evaluateMouseClick);
 
         _controller.addMouseMotionListener((MouseDragListener) this::evaluateMouseDrag);
 

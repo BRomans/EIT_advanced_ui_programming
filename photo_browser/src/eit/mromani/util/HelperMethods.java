@@ -5,7 +5,7 @@ package eit.mromani.util;
  * <p>
  * This class provides utility methods for the PhotoComponent class.
  */
-public class HelperMethods {
+public abstract class HelperMethods {
 
     /**
      * This function returns a scaling value based on the size of the picture
@@ -52,5 +52,28 @@ public class HelperMethods {
             verticalValid = true;
         }
         return horizontalValid && verticalValid;
+    }
+
+    /**
+     * This functions cut the last character of a string. If there are no characters in the string, a null string is returned
+     * @param str the string to be cut
+     * @return the initial string without the last character or a null string
+     */
+    public static String removeLastChar(String str) {
+        if(str.length() > 1) {
+            return str.substring(0, str.length() - 1);
+        } else
+            return "\0";
+    }
+
+
+    /**
+     * This function appends a character to the given string
+     * @param str the string under editing
+     * @param character a new character to add
+     * @return a new string containing the added character
+     */
+    public static String addCharacter(String str, char character) {
+        return str + String.valueOf(character);
     }
 }
