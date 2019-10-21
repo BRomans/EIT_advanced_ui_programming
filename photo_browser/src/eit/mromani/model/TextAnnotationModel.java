@@ -165,6 +165,7 @@ public class TextAnnotationModel extends BaseAnnotationModel {
             _currentLine = HelperMethods.addCharacter(_currentLine, character);
         }
         _currentLineIterator = new AttributedString(_currentLine, map);
+        fireChangeListener();
     }
 
     @Override

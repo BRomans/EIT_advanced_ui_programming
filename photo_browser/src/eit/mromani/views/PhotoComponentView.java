@@ -128,7 +128,6 @@ public class PhotoComponentView {
             Character keyValue = event.getKeyChar();
             System.out.println("Key pressed: " + keyValue);
             _currentTextAnnotation.processNewCharacter(keyValue);
-            _controller.repaint();
         }
     }
 

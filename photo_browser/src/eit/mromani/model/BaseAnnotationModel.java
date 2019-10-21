@@ -16,7 +16,7 @@ public abstract class BaseAnnotationModel implements AnnotationModel {
         this._changeListeners.remove(listener);
     }
 
-    private void fireChangeListener() {
+    protected void fireChangeListener() {
         for (ChangeListener listener : _changeListeners) {
             listener.stateChanged(new ChangeEvent(this));
         }

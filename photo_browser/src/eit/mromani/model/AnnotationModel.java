@@ -1,5 +1,6 @@
 package eit.mromani.model;
 
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 /**
@@ -10,6 +11,7 @@ import java.awt.*;
  */
 public interface AnnotationModel {
 
+    void addChangeListener(ChangeListener listener);
 
     int getCoordinateX();
 
