@@ -52,7 +52,9 @@ public class PhotoComponentView {
      */
     private void setupListeners() {
 
-        _controller.addMouseListener((MousePressListener) this::saveMouseCoordinates);
+        _controller.addMouseListener((MousePressListener) this::evaluateMousePressed);
+
+        _controller.addMouseListener((MouseReleasedListener) this::evaluateMouseReleased);
 
         _controller.addMouseListener((MouseClickListener) this::evaluateMouseClick);
 
@@ -66,9 +68,20 @@ public class PhotoComponentView {
      *
      * @param mouseEvent
      */
-    private void saveMouseCoordinates(MouseEvent mouseEvent) {
+    private void evaluateMousePressed(MouseEvent mouseEvent) {
         _start_position_x = mouseEvent.getX();
         _start_position_y = mouseEvent.getY();
+        initDrawingAnnotation(_start_position_x, _start_position_y);
+    }
+
+    /**
+     * Reset current annotation
+     *
+     * @param mouseEvent
+     */
+    private void evaluateMouseReleased(MouseEvent mouseEvent) {
+        _currentDrawingAnnotation = null;
+        _currentTextAnnotation = null;
     }
 
     /**
@@ -80,7 +93,6 @@ public class PhotoComponentView {
         if (mouseEvent.getClickCount() == 1) {
             System.out.println("single clicked");
             if (_controller.getFlipState()) {
-                initDrawingAnnotation(_start_position_x, _start_position_y);
                 initTextAnnotation(mouseEvent);
             }
         }
@@ -100,8 +112,6 @@ public class PhotoComponentView {
             System.out.println("Dragging the mouse");
             if(_currentDrawingAnnotation != null) {
                 addPoint(_start_position_x, _start_position_y, mouseEvent.getX(), mouseEvent.getY());
-            } else {
-                initDrawingAnnotation(_start_position_x, _start_position_y);
             }
             _start_position_x = mouseEvent.getX();
             _start_position_y = mouseEvent.getY();
