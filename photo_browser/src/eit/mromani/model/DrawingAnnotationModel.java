@@ -24,7 +24,7 @@ public class DrawingAnnotationModel extends BaseAnnotationModel {
     private String _shape;
 
     // TODO refactor the way drawings are saved
-    private List points = new ArrayList<Point>();
+    private List<Point> points = new ArrayList<Point>();
 
     /*Getters and setters*/
 
@@ -46,6 +46,10 @@ public class DrawingAnnotationModel extends BaseAnnotationModel {
 
     public DrawingAnnotationModel() {
         _lineColor = Color.BLACK;
+    }
+
+    public void addPoint(int x, int y) {
+        this.points.add(new Point(x, y));
     }
 
     @Override
@@ -86,6 +90,17 @@ public class DrawingAnnotationModel extends BaseAnnotationModel {
      */
     @Override
     public void drawAnnotation(Graphics2D graphics2D, int imageWidth, int centerX, int imageHeight, int centerY, float scale) {
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        for(int i=0; i<points.size()-1; i++){
+            setCoordinateX((int)points.get(i).getX());
+            setCoordinateY((int)points.get(i).getY());
+            setEndCoordinateX((int)points.get(i+1).getX());
+            setEndCoordinateY((int)points.get(i+1).getY());
+            drawSegment(graphics2D, imageWidth, centerX, imageHeight, centerY, scale);
+        }
+    }
+
+    private void drawSegment(Graphics2D graphics2D, int imageWidth, int centerX, int imageHeight, int centerY, float scale) {
         boolean startPointValid = HelperMethods.isOnThePicture(getCoordinateX(), getCoordinateY(),
                 imageWidth, centerX, imageHeight, centerY, scale);
 

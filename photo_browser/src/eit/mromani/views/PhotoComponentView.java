@@ -8,7 +8,6 @@ import eit.mromani.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.font.LineBreakMeasurer;
 import java.util.List;
 
 /**
@@ -38,8 +37,9 @@ public class PhotoComponentView {
     // controller of the component
     private PhotoComponent _controller;
 
-    // current editable annotation
-    private TextAnnotationModel _currentAnnotation;
+    // current editable annotations
+    private TextAnnotationModel _currentTextAnnotation;
+    private DrawingAnnotationModel _currentDrawingAnnotation;
 
     public PhotoComponentView(PhotoComponent controller) {
         this._controller = controller;
@@ -80,6 +80,7 @@ public class PhotoComponentView {
         if (mouseEvent.getClickCount() == 1) {
             System.out.println("single clicked");
             if (_controller.getFlipState()) {
+                initDrawingAnnotation(_start_position_x, _start_position_y);
                 initTextAnnotation(mouseEvent);
             }
         }
@@ -97,7 +98,11 @@ public class PhotoComponentView {
     private void evaluateMouseDrag(MouseEvent mouseEvent) {
         if (_controller.getFlipState()) {
             System.out.println("Dragging the mouse");
-            drawAndSaveLine(_start_position_x, _start_position_y, mouseEvent.getX(), mouseEvent.getY());
+            if(_currentDrawingAnnotation != null) {
+                addPoint(_start_position_x, _start_position_y, mouseEvent.getX(), mouseEvent.getY());
+            } else {
+                initDrawingAnnotation(_start_position_x, _start_position_y);
+            }
             _start_position_x = mouseEvent.getX();
             _start_position_y = mouseEvent.getY();
         }
@@ -112,7 +117,7 @@ public class PhotoComponentView {
         if (_controller.getFlipState()) {
             Character keyValue = event.getKeyChar();
             System.out.println("Key pressed: " + keyValue);
-            _currentAnnotation.processNewCharacter(keyValue);
+            _currentTextAnnotation.processNewCharacter(keyValue);
             _controller.repaint();
         }
     }
@@ -168,22 +173,23 @@ public class PhotoComponentView {
      *
      * @param startX starting point X coordinate
      * @param startY starting point Y coordinate
-     * @param endX   ending point X coordinate
-     * @param endY   ending point Y coordinate
      */
-    private void drawAndSaveLine(int startX, int startY, int endX, int endY) {
-        DrawingAnnotationModel annotationModel = new DrawingAnnotationModel();
+    private void addPoint(int startX, int startY, int endX, int endY) {
         Graphics2D graphics2D = (Graphics2D) _controller.getGraphics();
-        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        annotationModel.setCoordinateX(startX);
-        annotationModel.setCoordinateY(startY);
-        annotationModel.setEndCoordinateX(endX);
-        annotationModel.setEndCoordinateY(endY);
+        _currentDrawingAnnotation.addPoint(startX, startY);
+        _currentDrawingAnnotation.addPoint(endX, endY);
+        _currentDrawingAnnotation.drawAnnotation(graphics2D, _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
+
+    }
+
+    private void initDrawingAnnotation(int startX, int startY) {
+        DrawingAnnotationModel annotationModel = new DrawingAnnotationModel();
+        annotationModel.addPoint(startX, startY);
         annotationModel.setLineColor(_controller.getStyleToolbar().getSelectedColor());
         annotationModel.setLineSize(_controller.getStyleToolbar().getStrokeSize());
         annotationModel.setShape(_controller.getStyleToolbar().getSelectedShape());
-        annotationModel.drawAnnotation(graphics2D, _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
         _controller.addAnnotationModel(annotationModel);
+        _currentDrawingAnnotation = annotationModel;
         _controller.sendMessageToStatusBar("Drawing annotation successfully created!");
     }
 
@@ -201,7 +207,7 @@ public class PhotoComponentView {
         annotationModel.setFontSize(_controller.getStyleToolbar().getFontSize());
         annotationModel.setLineColor(_controller.getStyleToolbar().getSelectedColor());
         saveTextAnnotation(annotationModel);
-        _currentAnnotation = annotationModel;
+        _currentTextAnnotation = annotationModel;
     }
 
     private void saveTextAnnotation(TextAnnotationModel annotationModel) {
