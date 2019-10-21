@@ -51,7 +51,7 @@ public class PhotoComponent extends JComponent {
     }
 
     /**
-     * Flips the image from annotation mode to image mode and viceversa.
+     * Flips the image from annotation mode to image mode and vice versa.
      */
     public void flip() {
         if(!_model.isFlipped()) {

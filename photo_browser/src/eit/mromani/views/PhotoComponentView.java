@@ -8,10 +8,7 @@ import eit.mromani.util.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
-import java.awt.font.TextLayout;
-import java.text.AttributedCharacterIterator;
 import java.util.List;
 
 /**
@@ -37,15 +34,6 @@ public class PhotoComponentView {
     private int _scaledHeight;
     private int _centerX;
     private int _centerY;
-
-    // The LineBreakMeasurer used to line-break the paragraph.
-    private LineBreakMeasurer _lineMeasurer;
-
-    // index of the first character in the paragraph.
-    private int _paragraphStart;
-
-    // index of the first character after the end of the paragraph.
-    private int _paragraphEnd;
 
     // controller of the component
     private PhotoComponent _controller;
@@ -162,10 +150,10 @@ public class PhotoComponentView {
             List<AnnotationModel> drawingPoints = _controller.getDrawingPoints();
             List<AnnotationModel> textPoints = _controller.getTextPoints();
             for (AnnotationModel annotationModel : textPoints) {
-                drawTextAnnotation(graphics2D, (TextAnnotationModel) annotationModel);
+                annotationModel.drawAnnotation(graphics2D, _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
             }
             for (AnnotationModel annotationModel : drawingPoints) {
-                drawStrokeLine(graphics2D, (DrawingAnnotationModel) annotationModel);
+                annotationModel.drawAnnotation(graphics2D, _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
             }
         }
 
@@ -194,42 +182,9 @@ public class PhotoComponentView {
         annotationModel.setLineColor(_controller.getStyleToolbar().getSelectedColor());
         annotationModel.setLineSize(_controller.getStyleToolbar().getStrokeSize());
         annotationModel.setShape(_controller.getStyleToolbar().getSelectedShape());
-        drawStrokeLine(graphics2D, annotationModel);
+        annotationModel.drawAnnotation(graphics2D, _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
         _controller.addAnnotationModel(annotationModel);
         _controller.sendMessageToStatusBar("Drawing annotation successfully created!");
-    }
-
-    /**
-     * Support function that actually performs the drawing if the starting point and ending points are
-     * within valid boundaries
-     *
-     * @param graphics2D
-     * @param annotationModel the drawing annotation
-     */
-    private void drawStrokeLine(Graphics2D graphics2D, DrawingAnnotationModel annotationModel) {
-        boolean startPointValid = HelperMethods.isOnThePicture(annotationModel.getCoordinateX(), annotationModel.getCoordinateY(),
-                _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, Math.round(SCALE));
-
-        boolean endPointValid = HelperMethods.isOnThePicture(annotationModel.getEndCoordinateX(), annotationModel.getEndCoordinateY(),
-                _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, Math.round(SCALE));
-
-        if (startPointValid && endPointValid) {
-            graphics2D.setColor(annotationModel.getLineColor());
-            graphics2D.setStroke(new BasicStroke(annotationModel.getLineSize()));
-            if (annotationModel.getShape().equals("stroke")) {
-                graphics2D.drawLine(annotationModel.getCoordinateX(),
-                        annotationModel.getCoordinateY(),
-                        annotationModel.getEndCoordinateX(),
-                        annotationModel.getEndCoordinateY());
-            }
-            if (annotationModel.getShape().equals("square")) {
-                //TODO implement square drawing
-            }
-            if (annotationModel.getShape().equals("circle")) {
-                //TODO implement circle drawing
-            }
-
-        }
     }
 
     /**
@@ -252,64 +207,6 @@ public class PhotoComponentView {
     private void saveTextAnnotation(TextAnnotationModel annotationModel) {
         _controller.addAnnotationModel(annotationModel);
         _controller.sendMessageToStatusBar("Text annotation successfully created!");
-    }
-
-    /**
-     * Processes the text annotation and calculates boundaries for proper formatting.
-     * Custom implementation of the javadoc sample that can be found here:
-     * https://docs.oracle.com/javase/tutorial/2d/text/drawmulstring.html
-     *
-     * @param graphics2D      the graphics
-     * @param annotationPoint the text annotation
-     */
-    private void drawTextAnnotation(Graphics2D graphics2D, TextAnnotationModel annotationPoint) {
-        boolean startPointValid = HelperMethods.isOnThePicture(annotationPoint.getCoordinateX(), annotationPoint.getCoordinateY(),
-                _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, Math.round(SCALE));
-
-        if (startPointValid) {
-            graphics2D.setColor(annotationPoint.getLineColor());
-
-            AttributedCharacterIterator paragraph = annotationPoint.getCurrentLineIterator().getIterator();
-            _paragraphStart = paragraph.getBeginIndex();
-            _paragraphEnd = paragraph.getEndIndex();
-            FontRenderContext frc = graphics2D.getFontRenderContext();
-            _lineMeasurer = new LineBreakMeasurer(paragraph, frc);
-
-            // we calculate the X position with the photo width and the click X coordinate
-            float breakWidth = (float) (_controller.getImage().getWidth() / SCALE - annotationPoint.getCoordinateX() + _centerX);
-            float drawPosY = annotationPoint.getCoordinateY();
-            _lineMeasurer.setPosition(_paragraphStart);
-            try {
-                while (_lineMeasurer.getPosition() < _paragraphEnd) {
-
-                    TextLayout layout = _lineMeasurer.nextLayout(breakWidth);
-
-                    // Compute pen x position. If the paragraph is right-to-left we
-                    // will align the TextLayouts to the right edge of the panel.
-                    float drawPosX = layout.isLeftToRight()
-                            ? annotationPoint.getCoordinateX() : breakWidth - layout.getAdvance();
-
-                    // Move y-coordinate by the ascent of the layout.
-                    drawPosY += layout.getAscent();
-
-
-                    boolean validPoint = HelperMethods.isOnThePicture(Math.round(drawPosX), Math.round(drawPosY),
-                            _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, Math.round(SCALE));
-
-                    // Draw the TextLayout at (drawPosX, drawPosY).
-                    if(validPoint) {
-                        layout.draw(graphics2D, drawPosX, drawPosY);
-                    }
-
-                    // Move y-coordinate in preparation for next layout.
-                    drawPosY += layout.getDescent() + layout.getLeading();
-                }
-            } catch (Exception exception) {
-                System.out.println("There was a problem while rendering the annotation text");
-                _controller.sendMessageToStatusBar("There was a problem while rendering the annotation text, check log for more info.");
-                exception.printStackTrace();
-            }
-        }
     }
 
     public Dimension getSize() {

@@ -40,14 +40,14 @@ public abstract class HelperMethods {
      * @param scale scaling value
      * @return true if the annotation is within the boundaries of the image, else false.
      */
-    public static boolean isOnThePicture(int coordinateX, int coordinateY, int imageWidth, int centerX, int imageHeight, int centerY, int scale) {
+    public static boolean isOnThePicture(int coordinateX, int coordinateY, int imageWidth, int centerX, int imageHeight, int centerY, float scale) {
         boolean horizontalValid = false;
         boolean verticalValid = false;
-        if (coordinateX < imageWidth / scale + centerX
+        if (coordinateX < Math.round(imageWidth / scale + centerX)
                 && coordinateX > centerX) {
             horizontalValid = true;
         }
-        if (coordinateY < imageHeight / scale + centerY
+        if (coordinateY < Math.round(imageHeight / scale + centerY)
                 && coordinateY > centerY) {
             verticalValid = true;
         }

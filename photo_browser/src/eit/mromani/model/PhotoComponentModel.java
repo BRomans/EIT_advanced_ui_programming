@@ -5,6 +5,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,9 +36,9 @@ public class PhotoComponentModel {
 
     public void addTextPoint(AnnotationModel annotationModel) { this._textAnnotation.add(annotationModel);}
 
-    public List<AnnotationModel> getDrawingPoints() { return this._drawingAnnotation; }
+    public List<AnnotationModel> getDrawingPoints() { return Collections.unmodifiableList(this._drawingAnnotation); }
 
-    public List<AnnotationModel> getTextPoints() { return this._textAnnotation; }
+    public List<AnnotationModel> getTextPoints() { return Collections.unmodifiableList(this._textAnnotation); }
 
     public void flipPhoto(boolean isFlipped) {
         if(isFlipped != this._isFlipped) {

@@ -8,15 +8,15 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * @author BRomans
- *
+ * <p>
  * This class implements a JPanel  with status bar functionalities
  */
 public class StatusBar extends JPanel {
 
     private JLabel _statusLabel;
     private String _statusPlaceholder = "#################";
+    private boolean _timerOver;
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public StatusBar() {
@@ -46,13 +46,16 @@ public class StatusBar extends JPanel {
      */
     public void showStatusMessage(String message) {
         _statusLabel.setText(message);
+
         ScheduledFuture timer = scheduler.schedule(new Runnable() {
             @Override
             public void run() {
                 System.out.println("Clear status message");
                 _statusLabel.setText(_statusPlaceholder);
+                _timerOver = true;
             }
-        }, 5, TimeUnit.SECONDS);
+        }, 10, TimeUnit.SECONDS);
+
 
     }
 }

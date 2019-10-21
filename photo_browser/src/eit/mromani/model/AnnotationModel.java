@@ -22,4 +22,6 @@ public interface AnnotationModel {
     void setCoordinateX(int coordinateX);
 
     void setCoordinateY(int coordinateY);
+
+    void drawAnnotation(Graphics2D graphics2D,  int imageWidth, int centerX, int imageHeight, int centerY, float scale);
 }

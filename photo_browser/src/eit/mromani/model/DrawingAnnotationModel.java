@@ -1,6 +1,10 @@
 package eit.mromani.model;
 
+import eit.mromani.util.HelperMethods;
+
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -8,7 +12,7 @@ import java.awt.*;
  *
  * This is the model for free-hand Drawing annotations
  */
-public class DrawingAnnotationModel implements AnnotationModel {
+public class DrawingAnnotationModel extends BaseAnnotationModel {
 
     // annotation fields
     private int _coordinateX;
@@ -18,6 +22,9 @@ public class DrawingAnnotationModel implements AnnotationModel {
     private Color _lineColor;
     private int _lineSize;
     private String _shape;
+
+    // TODO refactor the way drawings are saved
+    private List points = new ArrayList<Point>();
 
     /*Getters and setters*/
 
@@ -69,6 +76,36 @@ public class DrawingAnnotationModel implements AnnotationModel {
     @Override
     public void setCoordinateY(int coordinateY) {
         this._coordinateY = coordinateY;
+    }
+
+    /**
+     * Support function that actually performs the drawing if the starting point and ending points are
+     * within valid boundaries
+     *
+     * @param graphics2D
+     */
+    @Override
+    public void drawAnnotation(Graphics2D graphics2D, int imageWidth, int centerX, int imageHeight, int centerY, float scale) {
+        boolean startPointValid = HelperMethods.isOnThePicture(getCoordinateX(), getCoordinateY(),
+                imageWidth, centerX, imageHeight, centerY, scale);
+
+        boolean endPointValid = HelperMethods.isOnThePicture(getEndCoordinateX(), getEndCoordinateY(),
+                imageWidth, centerX, imageHeight, centerY, scale);
+
+        if (startPointValid && endPointValid) {
+            graphics2D.setColor(getLineColor());
+            graphics2D.setStroke(new BasicStroke(getLineSize()));
+            if (getShape().equals("stroke")) {
+                graphics2D.drawLine(getCoordinateX(), getCoordinateY(), getEndCoordinateX(), getEndCoordinateY());
+            }
+            if (getShape().equals("square")) {
+                //TODO implement square drawing
+            }
+            if (getShape().equals("circle")) {
+                //TODO implement circle drawing
+            }
+
+        }
     }
 
     public int getLineSize() {
