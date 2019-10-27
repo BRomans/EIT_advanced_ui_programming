@@ -5,9 +5,15 @@ import eit.mromani.model.*;
 import eit.mromani.model.AnnotationModel;
 import eit.mromani.model.DrawingAnnotationModel;
 import eit.mromani.util.*;
+import fr.lri.swingstates.sm.BasicInputStateMachine;
+import fr.lri.swingstates.sm.State;
+import fr.lri.swingstates.sm.Transition;
+import fr.lri.swingstates.sm.transitions.*;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.util.List;
 
 /**
@@ -41,9 +47,109 @@ public class PhotoComponentView {
     private TextAnnotationModel _currentTextAnnotation;
     private DrawingAnnotationModel _currentDrawingAnnotation;
 
+    private BasicInputStateMachine _stateMachine;
+
     public PhotoComponentView(PhotoComponent controller) {
         this._controller = controller;
-        setupListeners();
+        //setupListeners();
+        setupStateMachine();
+    }
+
+    private void setupStateMachine() {
+        this._stateMachine = new BasicInputStateMachine() {
+
+            Point2D ptInit = null;
+            JTextField tf;
+
+            public State photoMode = new State() {
+
+                public boolean guard() {
+                    return !_controller.getFlipState();
+                }
+
+                Transition enter = new Enter() {
+                    public void action() {
+                        System.out.println("Photo Mode!");
+                    }
+                };
+
+                Transition click = new Click(BUTTON1, ">> annotationMode") {
+
+                    public void action() {
+                        evaluateMouseClick(getMouseEvent());
+                    }
+                };
+
+            };
+
+            public State annotationMode = new State() {
+
+
+                Transition enter = new Enter() {
+                    public void action() {
+                        System.out.println("Annotation Mode!");
+                    }
+
+                };
+
+                Transition click = new Click(BUTTON1, ">> photoMode") {
+
+                    public void action() {
+                        evaluateMouseClick(getMouseEvent());
+                        evaluateMousePressed(getMouseEvent());
+                    }
+                };
+
+                Transition keyPressed = new KeyPress() {
+                    public void action() {
+                        evaluateKeyTyped(getChar());
+                    }
+                };
+
+                Transition drag = new Drag(BUTTON1) {
+                    public void action() {
+                        evaluateMouseDrag(getMouseEvent());
+                    }
+                };
+
+                Transition release = new Release(BUTTON1) {
+                    public void action() {
+                        evaluateMouseReleased(getMouseEvent());
+                    }
+                };
+
+            };
+
+            public State selection = new State() {
+                Transition leave = new Leave(">> annotationMode") {
+                    public void action() {
+                        // tf.unhilite()
+                    }
+                };
+
+                Transition pressCanc = new KeyPress('+') {
+                    public void action() {
+                        // increment tf.value
+                    }
+                };
+
+
+                Transition press = new Press(BUTTON1, ">> control") {
+                    public void action() {
+                        System.out.println("Annotation State control");
+
+                    }
+                };
+
+            };
+
+            Transition release = new Release(BUTTON1, ">> out") {
+
+            };
+
+
+        };
+        this._stateMachine.addAsListenerOf(_controller);
 
     }
 
@@ -71,7 +177,9 @@ public class PhotoComponentView {
     private void evaluateMousePressed(MouseEvent mouseEvent) {
         _start_position_x = mouseEvent.getX();
         _start_position_y = mouseEvent.getY();
-        initDrawingAnnotation(_start_position_x, _start_position_y);
+        if (_controller.getFlipState()) {
+            initDrawingAnnotation(_start_position_x, _start_position_y);
+        }
     }
 
     /**
@@ -110,7 +218,7 @@ public class PhotoComponentView {
     private void evaluateMouseDrag(MouseEvent mouseEvent) {
         if (_controller.getFlipState()) {
             System.out.println("Dragging the mouse");
-            if(_currentDrawingAnnotation != null) {
+            if (_currentDrawingAnnotation != null) {
                 addPoint(_start_position_x, _start_position_y, mouseEvent.getX(), mouseEvent.getY());
             }
             _start_position_x = mouseEvent.getX();
@@ -124,8 +232,13 @@ public class PhotoComponentView {
      * @param event
      */
     private void evaluateKeyTyped(KeyEvent event) {
+        Character keyValue = event.getKeyChar();
+        evaluateKeyTyped(keyValue);
+    }
+
+    private void evaluateKeyTyped(char key) {
         if (_controller.getFlipState()) {
-            Character keyValue = event.getKeyChar();
+            Character keyValue = key;
             System.out.println("Key pressed: " + keyValue);
             _currentTextAnnotation.processNewCharacter(keyValue);
         }

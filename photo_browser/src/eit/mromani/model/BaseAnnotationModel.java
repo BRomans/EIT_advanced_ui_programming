@@ -8,6 +8,10 @@ public abstract class BaseAnnotationModel implements AnnotationModel {
 
     private ArrayList<ChangeListener> _changeListeners = new ArrayList<>();
 
+    public BaseAnnotationModel() {
+
+    }
+
     public void addChangeListener(ChangeListener listener) {
         this._changeListeners.add(listener);
     }

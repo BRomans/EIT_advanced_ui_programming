@@ -1,5 +1,6 @@
 package eit.mromani.model;
 
+import eit.mromani.controllers.PhotoComponent;
 import eit.mromani.util.HelperMethods;
 import java.awt.*;
 import java.awt.event.*;

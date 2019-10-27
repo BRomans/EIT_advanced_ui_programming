@@ -26,26 +26,26 @@ public class DrawingAnnotationModel extends BaseAnnotationModel {
     // TODO refactor the way drawings are saved
     private List<Point> points = new ArrayList<Point>();
 
+    public DrawingAnnotationModel() {
+        _lineColor = Color.BLACK;
+    }
+
     /*Getters and setters*/
 
-    public int getEndCoordinateX() {
+    private int getEndCoordinateX() {
         return _endCoordinateX;
     }
 
-    public void setEndCoordinateX(int endCoordinateX) {
+    private void setEndCoordinateX(int endCoordinateX) {
         this._endCoordinateX = endCoordinateX;
     }
 
-    public int getEndCoordinateY() {
+    private int getEndCoordinateY() {
         return _endCoordinateY;
     }
 
-    public void setEndCoordinateY(int endCoordinateY) {
+    private void setEndCoordinateY(int endCoordinateY) {
         this._endCoordinateY = endCoordinateY;
-    }
-
-    public DrawingAnnotationModel() {
-        _lineColor = Color.BLACK;
     }
 
     public void addPoint(int x, int y) {
