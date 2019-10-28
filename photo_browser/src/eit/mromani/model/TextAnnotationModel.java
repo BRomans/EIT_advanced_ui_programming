@@ -43,10 +43,10 @@ public class TextAnnotationModel extends BaseAnnotationModel {
             _currentLine,
             map);
 
-    public TextAnnotationModel(MouseEvent mouseEvent) {
+    public TextAnnotationModel(int posX, int posY ) {
         setLineColor(Color.black);
-        setCoordinateX(mouseEvent.getX());
-        setCoordinateY(mouseEvent.getY());
+        setCoordinateX(posX);
+        setCoordinateY(posY);
         map.put(TextAttribute.FAMILY, "Serif");
         map.put(TextAttribute.SIZE, new Float(18.0));
     }

@@ -77,12 +77,19 @@ public class PhotoComponentView {
 
                     public void action() {
                         evaluateMouseClick(getMouseEvent());
+                        if(_controller.getFlipState()) {
+                            setOutputStateName(">> annotationMode");
+                        }
                     }
                 };
 
             };
 
             public State annotationMode = new State() {
+
+                public boolean guard() {
+                    return _controller.getFlipState();
+                }
 
 
                 Transition enter = new Enter() {
@@ -92,11 +99,12 @@ public class PhotoComponentView {
 
                 };
 
-                Transition click = new Click(BUTTON1, ">> photoMode") {
-
+                Transition click = new Click(BUTTON1) {
                     public void action() {
                         evaluateMouseClick(getMouseEvent());
-                        evaluateMousePressed(getMouseEvent());
+                        if(!_controller.getFlipState()) {
+                            setOutputStateName(">> photoMode");
+                        }
                     }
                 };
 
@@ -111,25 +119,21 @@ public class PhotoComponentView {
                         evaluateMouseDrag(getMouseEvent());
                     }
                 };
-
-                Transition release = new Release(BUTTON1) {
+                Transition release = new Release(BUTTON1, ">> annotationMode") {
                     public void action() {
                         evaluateMouseReleased(getMouseEvent());
                     }
                 };
-
             };
 
             public State selection = new State() {
                 Transition leave = new Leave(">> annotationMode") {
                     public void action() {
-                        // tf.unhilite()
                     }
                 };
 
                 Transition pressCanc = new KeyPress('+') {
                     public void action() {
-                        // increment tf.value
                     }
                 };
 
@@ -188,8 +192,12 @@ public class PhotoComponentView {
      * @param mouseEvent
      */
     private void evaluateMouseReleased(MouseEvent mouseEvent) {
-        _currentDrawingAnnotation = null;
-        _currentTextAnnotation = null;
+        try {
+            _currentDrawingAnnotation = null;
+            _currentTextAnnotation = null;
+        } catch(Exception e) {
+            System.out.println("Annotation not initialized!");
+        }
     }
 
     /**
@@ -218,7 +226,9 @@ public class PhotoComponentView {
     private void evaluateMouseDrag(MouseEvent mouseEvent) {
         if (_controller.getFlipState()) {
             System.out.println("Dragging the mouse");
-            if (_currentDrawingAnnotation != null) {
+            if (_currentDrawingAnnotation == null) {
+                evaluateMousePressed(mouseEvent);
+            } else {
                 addPoint(_start_position_x, _start_position_y, mouseEvent.getX(), mouseEvent.getY());
             }
             _start_position_x = mouseEvent.getX();
@@ -237,6 +247,9 @@ public class PhotoComponentView {
     }
 
     private void evaluateKeyTyped(char key) {
+        if(_currentTextAnnotation == null) {
+            initTextAnnotation(_start_position_x, _start_position_y);
+        }
         if (_controller.getFlipState()) {
             Character keyValue = key;
             System.out.println("Key pressed: " + keyValue);
@@ -323,8 +336,11 @@ public class PhotoComponentView {
     private void initTextAnnotation(MouseEvent mouseEvent) {
         _start_position_x = mouseEvent.getX();
         _start_position_y = mouseEvent.getY();
+       initTextAnnotation(_start_position_x, _start_position_y);
+    }
+    private void initTextAnnotation(int posX, int posY) {
         _controller.requestFocus();
-        TextAnnotationModel annotationModel = new TextAnnotationModel(mouseEvent);
+        TextAnnotationModel annotationModel = new TextAnnotationModel(posX, posY);
         annotationModel.setFontFamily(_controller.getStyleToolbar().getSelectedFont());
         annotationModel.setFontSize(_controller.getStyleToolbar().getFontSize());
         annotationModel.setLineColor(_controller.getStyleToolbar().getSelectedColor());
