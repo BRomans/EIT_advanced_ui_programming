@@ -3,6 +3,7 @@ package eit.mromani.model;
 import eit.mromani.util.HelperMethods;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +23,15 @@ public class DrawingAnnotationModel extends BaseAnnotationModel {
     private Color _lineColor;
     private int _lineSize;
     private String _shape;
+    private boolean _showBoundaries;
+    private Rectangle2D boundaries;
 
     // TODO refactor the way drawings are saved
     private List<Point> points = new ArrayList<Point>();
 
     public DrawingAnnotationModel() {
         _lineColor = Color.BLACK;
+        this.boundaries = new Rectangle();
     }
 
     /*Getters and setters*/
@@ -80,6 +84,21 @@ public class DrawingAnnotationModel extends BaseAnnotationModel {
     @Override
     public void setCoordinateY(int coordinateY) {
         this._coordinateY = coordinateY;
+    }
+
+    @Override
+    public boolean isIntoBoundaries() {
+        return true;
+    }
+
+    @Override
+    public boolean showBoundaries() {
+        return true;
+    }
+
+    @Override
+    public Rectangle2D getBoundaries() {
+        return this.boundaries;
     }
 
     /**

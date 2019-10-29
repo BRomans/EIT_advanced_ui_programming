@@ -1,8 +1,9 @@
 package eit.mromani.controllers;
 
-import eit.mromani.model.*;
 import eit.mromani.model.AnnotationModel;
 import eit.mromani.model.DrawingAnnotationModel;
+import eit.mromani.model.PhotoComponentModel;
+import eit.mromani.model.TextAnnotationModel;
 import eit.mromani.views.PhotoComponentView;
 
 import javax.imageio.ImageIO;

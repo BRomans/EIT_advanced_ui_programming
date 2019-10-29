@@ -1,13 +1,13 @@
 package eit.mromani.model;
 
-import eit.mromani.controllers.PhotoComponent;
 import eit.mromani.util.HelperMethods;
+
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.Hashtable;
@@ -24,6 +24,10 @@ public class TextAnnotationModel extends BaseAnnotationModel {
     private int _coordinateX;
     private int _coordinateY;
     private Color _lineColor;
+    private Rectangle2D _boundaries;
+    private boolean _showBoundaries;
+    private int _boundariesWidth;
+    private int _boundariesHeight;
 
     private final Hashtable<TextAttribute, Object> map = new Hashtable<TextAttribute, Object>();
 
@@ -49,6 +53,8 @@ public class TextAnnotationModel extends BaseAnnotationModel {
         setCoordinateY(posY);
         map.put(TextAttribute.FAMILY, "Serif");
         map.put(TextAttribute.SIZE, new Float(18.0));
+        this._boundaries = new Rectangle();
+
     }
 
     /*Getters and setters*/
@@ -68,7 +74,7 @@ public class TextAnnotationModel extends BaseAnnotationModel {
         return this._lineColor;
     }
 
-    public AttributedString getCurrentLineIterator() {
+    private AttributedString getCurrentLineIterator() {
         return this._currentLineIterator;
     }
 
@@ -97,7 +103,6 @@ public class TextAnnotationModel extends BaseAnnotationModel {
      */
     @Override
     public void drawAnnotation(Graphics2D graphics2D, int imageWidth, int centerX, int imageHeight, int centerY, float scale) {
-        //TODO Refactor drawing method
         boolean startPointValid = HelperMethods.isOnThePicture(getCoordinateX(), getCoordinateY(),
                 imageWidth, centerX, imageHeight, centerY, scale);
 
@@ -133,18 +138,40 @@ public class TextAnnotationModel extends BaseAnnotationModel {
 
                     // Draw the TextLayout at (drawPosX, drawPosY).
                     if(validPoint) {
+                        _boundaries = layout.getBounds();
+                        //TODO finish implementing boundaries calculations
+                        if(_boundariesWidth < _boundaries.getWidth()) {
+                            this._boundariesWidth = (int) _boundaries.getWidth();
+                        }
                         layout.draw(graphics2D, drawPosX, drawPosY);
                     }
 
                     // Move y-coordinate in preparation for next layout.
                     drawPosY += layout.getDescent() + layout.getLeading();
                 }
+
             } catch (Exception exception) {
                 System.out.println("There was a problem while rendering the annotation text");
                 //.sendMessageToStatusBar("There was a problem while rendering the annotation text, check log for more info.");
                 exception.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public boolean isIntoBoundaries() {
+        return true;
+    }
+
+    //TODO implement boundaries
+    @Override
+    public boolean showBoundaries() {
+        return false;
+    }
+
+    @Override
+    public Rectangle2D getBoundaries() {
+        return new Rectangle(getCoordinateX(), getCoordinateY(), _boundariesWidth, _boundariesHeight);
     }
 
     public void setFontFamily(String fontFamily) {

@@ -1,10 +1,12 @@
 package eit.mromani.views;
 
 import eit.mromani.controllers.PhotoComponent;
-import eit.mromani.model.*;
 import eit.mromani.model.AnnotationModel;
 import eit.mromani.model.DrawingAnnotationModel;
+import eit.mromani.model.PhotoComponentModel;
+import eit.mromani.model.TextAnnotationModel;
 import eit.mromani.util.*;
+import fr.lri.swingstates.canvas.transitions.EnterOnTag;
 import fr.lri.swingstates.sm.BasicInputStateMachine;
 import fr.lri.swingstates.sm.State;
 import fr.lri.swingstates.sm.Transition;
@@ -12,8 +14,11 @@ import fr.lri.swingstates.sm.transitions.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -124,33 +129,17 @@ public class PhotoComponentView {
                         evaluateMouseReleased(getMouseEvent());
                     }
                 };
-            };
 
-            public State selection = new State() {
-                Transition leave = new Leave(">> annotationMode") {
+                //TODO finish implementing picking
+                Transition select = new EnterOnTag("eit.mromani.model.Annotation", ">> in") {
                     public void action() {
+
+                        System.out.println("Annotation found!");
                     }
+
+
                 };
-
-                Transition pressCanc = new KeyPress('+') {
-                    public void action() {
-                    }
-                };
-
-
-                Transition press = new Press(BUTTON1, ">> control") {
-                    public void action() {
-                        System.out.println("Annotation State control");
-
-                    }
-                };
-
             };
-
-            Transition release = new Release(BUTTON1, ">> out") {
-
-            };
-
 
         };
         this._stateMachine.addAsListenerOf(_controller);
@@ -158,7 +147,7 @@ public class PhotoComponentView {
     }
 
     /**
-     * Setups listeners with functional interfaces
+     * Setups listeners with functional interfaces. No more used since State Machine implementation, but kept for reference.
      */
     private void setupListeners() {
 
@@ -242,7 +231,7 @@ public class PhotoComponentView {
      * @param event
      */
     private void evaluateKeyTyped(KeyEvent event) {
-        Character keyValue = event.getKeyChar();
+        char keyValue = event.getKeyChar();
         evaluateKeyTyped(keyValue);
     }
 
@@ -276,31 +265,25 @@ public class PhotoComponentView {
         this._centerX = (photoComponent.getX() + photoComponent.getWidth() - this._scaledWidth) / 2;
         this._centerY = (photoComponent.getY() + photoComponent.getHeight() - this._scaledHeight) / 2;
 
-        if (!model.isFlipped()) {
-
-            // draw the image
-            Image image = _controller.getImage();
-            image = image.getScaledInstance(_scaledWidth, _scaledHeight, Image.SCALE_DEFAULT);
-            graphics2D.drawImage(image, _centerX, _centerY, null);
-        } else {
-
-            // draw the canvas and the annotations
-            graphics2D.setColor(Color.white);
-            graphics2D.fillRect(_centerX, _centerY, _scaledWidth, _scaledHeight);
-            List<AnnotationModel> drawingPoints = _controller.getDrawingPoints();
-            List<AnnotationModel> textPoints = _controller.getTextPoints();
-            for (AnnotationModel annotationModel : textPoints) {
-                annotationModel.drawAnnotation(graphics2D, _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
-            }
-            for (AnnotationModel annotationModel : drawingPoints) {
-                annotationModel.drawAnnotation(graphics2D, _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
-            }
-        }
-
+        // draw the image
+        Image image = _controller.getImage();
+        image = image.getScaledInstance(_scaledWidth, _scaledHeight, Image.SCALE_DEFAULT);
+        graphics2D.drawImage(image, _centerX, _centerY, null);
         // draw the border
         graphics2D.setStroke(new BasicStroke(1));
         graphics2D.setColor(Color.black);
         graphics2D.drawRect(_centerX, _centerY, _scaledWidth, _scaledHeight);
+        if (model.isFlipped()) {
+            for (AnnotationModel annotationModel : getAllAnnotations()) {
+                annotationModel.drawAnnotation(graphics2D, _controller.getImage().getWidth(), _centerX, _controller.getImage().getHeight(), _centerY, SCALE);
+                if(annotationModel.showBoundaries()) {
+                    graphics2D.setColor(Color.red);
+                    Rectangle2D boundaries = annotationModel.getBoundaries();
+                    graphics2D.draw(boundaries);
+                }
+            }
+        }
+
     }
 
     /**
@@ -345,12 +328,36 @@ public class PhotoComponentView {
         annotationModel.setFontSize(_controller.getStyleToolbar().getFontSize());
         annotationModel.setLineColor(_controller.getStyleToolbar().getSelectedColor());
         saveTextAnnotation(annotationModel);
+
         _currentTextAnnotation = annotationModel;
     }
 
     private void saveTextAnnotation(TextAnnotationModel annotationModel) {
         _controller.addAnnotationModel(annotationModel);
         _controller.sendMessageToStatusBar("Text annotation successfully created!");
+    }
+
+    //TODO finish implementing picking
+    public AnnotationModel detectAnnotation(Point2D p) {
+        for (AnnotationModel annotation : getAllAnnotations()) {
+            if (annotation.getBoundaries().contains(p)) {
+                return annotation;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Groups text and drawing annotations and return all of them together
+     * @return all the annotations
+     */
+    private List<AnnotationModel> getAllAnnotations() {
+        List<AnnotationModel> drawingPoints = _controller.getDrawingPoints();
+        List<AnnotationModel> textPoints = _controller.getTextPoints();
+        List<AnnotationModel> allAnnotations = new ArrayList<>();
+        allAnnotations.addAll(drawingPoints);
+        allAnnotations.addAll(textPoints);
+        return allAnnotations;
     }
 
     public Dimension getSize() {
